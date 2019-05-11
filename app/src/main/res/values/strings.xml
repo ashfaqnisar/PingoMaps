@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GoogleMaps</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="input_address">Address:</string>
+    <string name="send">Send</string>
+    <string name="title_activity_address">Map</string>
+    <string name="searching_address">Searching Current Address</string>
+</resources>

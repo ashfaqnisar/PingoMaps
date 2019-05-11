@@ -15,10 +15,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.common.api.Status
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
@@ -62,7 +59,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mContext = applicationContext
 
         mAddress = findViewById(R.id.txtLocationAddress)
-        mAddress.ellipsize = TextUtils.TruncateAt.MARQUEE;
+        mAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
         mAddress.marqueeRepeatLimit = -1
         mAddress.isSelected = true
         mAddress.setSingleLine(true)
@@ -77,7 +74,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mMapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mMapFragment.getMapAsync(this)
         mPlacesClient = Places.createClient(this)
-        mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME)
+        mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG)
 
     }
 
@@ -103,14 +100,27 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         if (requestCode == mAutocompleteRequestCode) {
-            if (resultCode == RESULT_OK) {
-                var place: Place = Autocomplete.getPlaceFromIntent(data!!)
-                makeToast("Place:" + place.name + place.id)
-            } else if (resultCode == RESULT_ERROR) {
-                var status: Status = Autocomplete.getStatusFromIntent(data!!)
-                makeToast("Status: " + status.statusMessage)
-            } else if (resultCode == RESULT_CANCELED) {
-                makeToast("User Cancelled the operation")
+            when (resultCode) {
+                RESULT_OK -> {
+                    val place: Place = Autocomplete.getPlaceFromIntent(data!!)
+                    makeToast("Place:" + place.name + place.id)
+
+                    if (!place.address.toString().contains(place.name.toString())) {
+                        log("onActivityResult():The address contains the name")
+                        val address: String = place.name.toString() + place.address
+                        mAddress.text = address
+                    }
+
+                    updateTheCamera(place.latLng)
+                    createMarker(place.latLng)
+
+                    makeToast("location is" + place.latLng)
+                }
+                RESULT_ERROR -> {
+                    val status: Status = Autocomplete.getStatusFromIntent(data!!)
+                    makeToast("Status: " + status.statusMessage)
+                }
+                RESULT_CANCELED -> makeToast("User Cancelled the operation")
             }
         }
     }
@@ -156,11 +166,16 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun createMarker() {
-        //TODO: Create a marker in the map.
-        val hyderabad = LatLng(17.3850, 78.4867)
-        mMap.addMarker(MarkerOptions().position(hyderabad).title("Marker in Hyderabad"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
+    private fun createMarker(latLng: LatLng?) {
+        val marker: LatLng? = latLng
+        mMap.addMarker(MarkerOptions().position(marker!!))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker, 12.0f))
+    }
+
+    private fun updateTheCamera(latLng: LatLng?) {
+        val updateCamera: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
+        log("updateTheCamera: Updating the camera")
+        mMap.animateCamera(updateCamera)
     }
 
     private fun log(log: String) {

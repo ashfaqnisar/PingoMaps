@@ -114,6 +114,12 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+        val hyderabad = LatLng(17.3850, 78.4867)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
+
+
 
         /*try{
             val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))

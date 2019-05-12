@@ -5,4 +5,6 @@
     <string name="send">Send</string>
     <string name="title_activity_address">Map</string>
     <string name="searching_address">Searching Current Address</string>
+    <string name="provide_permissions">Provide Permissions</string>
+    <string name="please_provide_the_permissions">Please Provide the permissions</string>
 </resources>

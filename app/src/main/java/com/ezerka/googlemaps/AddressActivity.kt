@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
@@ -15,6 +16,8 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.common.api.Status
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -54,6 +57,9 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mFields: List<Place.Field>
     private lateinit var mPickupMarker: Marker
     private lateinit var mDestinationMarker: Marker
+    private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var mLastLocation: Location
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +97,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mPlacesClient = Places.createClient(this)
         mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG)
 
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
     }
 
     private fun assignTheLinks() {
@@ -107,7 +115,17 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.uiSettings.isZoomControlsEnabled = true
 
+        /*try{
+            val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))
 
+            if(!success){
+                makeToast("Unable to customize the  map")
+            }
+        }
+        catch (error: Resources.NotFoundException){
+            logError("Error: $error")
+        }
+*/
         //isCameraIdle()
     }
 

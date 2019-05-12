@@ -94,6 +94,13 @@
                     android:src="@drawable/ic_placeholder"/>
 
         </FrameLayout>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/id_But_My_Location"
+                android:drawableTint="@color/colorAccent"
+                android:drawableStart="@android:drawable/ic_menu_mylocation"
+                android:elevation="30dp"/>
 
     </FrameLayout>
 

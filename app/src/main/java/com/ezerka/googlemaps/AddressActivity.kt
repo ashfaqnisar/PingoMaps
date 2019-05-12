@@ -17,6 +17,7 @@ import android.widget.Toast
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -32,13 +33,18 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //Constant variables
     private val TAG: String = "AddressActivity: "
-    private val mAutocompleteRequestCode: Int = 1
+    private val mPickupRequestCode: Int = 1
+    private val mDestinationRequestCode: Int = 2
     private lateinit var mContext: Context
+    private var mDestinationCount: Int = 0
+    private var mPickupCount: Int = 0
 
     //Normal Variables
     private lateinit var mKey: String
-    private lateinit var mAddress: TextView
-    private lateinit var mCardView: CardView
+    private lateinit var mPickupAddress: TextView
+    private lateinit var mPickupCardView: CardView
+    private lateinit var mDestinationAddress: TextView
+    private lateinit var mDestinationCardView: CardView
 
     //Map Variables
     private lateinit var mMapFragment: SupportMapFragment
@@ -46,6 +52,9 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mCenter: LatLng
     private lateinit var mPlacesClient: PlacesClient
     private lateinit var mFields: List<Place.Field>
+    private lateinit var mPickupMarker: Marker
+    private lateinit var mDestinationMarker: Marker
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,15 +67,21 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun assignTheViews() {
         mContext = applicationContext
 
-        mAddress = findViewById(R.id.txtLocationAddress)
-        mAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
-        mAddress.marqueeRepeatLimit = -1
-        mAddress.isSelected = true
-        mAddress.setSingleLine(true)
+        mPickupAddress = findViewById(R.id.id_text_pickup_address)
+        mPickupAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
+        mPickupAddress.marqueeRepeatLimit = -1
+        mPickupAddress.isSelected = true
+        mPickupAddress.setSingleLine(true)
+
+        mDestinationAddress = findViewById(R.id.id_text_destination_address)
+        mDestinationAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
+        mDestinationAddress.marqueeRepeatLimit = -1
+        mDestinationAddress.isSelected = true
+        mDestinationAddress.setSingleLine(true)
 
         mKey = getString(R.string.google_maps_key)
-        mCardView = findViewById(R.id.cardView)
-
+        mPickupCardView = findViewById(R.id.id_cardview_pickup)
+        mDestinationCardView = findViewById(R.id.id_cardview_destination)
 
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, mKey)
@@ -79,8 +94,11 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun assignTheLinks() {
-        mCardView.setOnClickListener {
-            openAutoComplete()
+        mPickupCardView.setOnClickListener {
+            openPickupAutocomplete()
+        }
+        mDestinationCardView.setOnClickListener {
+            openDestAutocomplete()
         }
     }
 
@@ -89,38 +107,70 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.uiSettings.isZoomControlsEnabled = true
 
-        isCameraIdle()
+
+        //isCameraIdle()
     }
 
-    private fun openAutoComplete() {
-        val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, mFields).build(mContext)
-        startActivityForResult(intent, mAutocompleteRequestCode)
+    private fun openPickupAutocomplete() {
+        val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(mContext)
+        startActivityForResult(intent, mPickupRequestCode)
+    }
+
+    private fun openDestAutocomplete() {
+        val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(mContext)
+        startActivityForResult(intent, mDestinationRequestCode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        if (requestCode == mAutocompleteRequestCode) {
+        if (requestCode == mPickupRequestCode) {
             when (resultCode) {
                 RESULT_OK -> {
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
                     makeToast("Place:" + place.name + place.id)
 
-                    if (!place.address.toString().contains(place.name.toString())) {
-                        log("onActivityResult():The address contains the name")
-                        val address: String = place.name.toString() + place.address
-                        mAddress.text = address
-                    }
+                    val address: String = place.name.toString() + place.address
+                    mPickupAddress.text = address
+
 
                     updateTheCamera(place.latLng)
-                    createMarker(place.latLng)
+                    placePickupMarker(place.latLng)
 
-                    makeToast("location is" + place.latLng)
+                    makeToast("Log: onActivityResult(): Pickup: Location is" + place.latLng)
                 }
                 RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
-                    makeToast("Status: " + status.statusMessage)
+                    log("Log: onActivityResult(): Pickup: Status: " + status.statusMessage)
                 }
-                RESULT_CANCELED -> makeToast("User Cancelled the operation")
+                RESULT_CANCELED -> log("Log: onActivityResult(): Pickup: User Cancelled the operation")
+            }
+        }
+
+        if (requestCode == mDestinationRequestCode) {
+            when (resultCode) {
+                RESULT_OK -> {
+                    val place: Place = Autocomplete.getPlaceFromIntent(data!!)
+                    makeToast("Place:" + place.name + place.id)
+
+                    val address: String = place.address.toString()
+                    mDestinationAddress.text = address
+
+
+                    updateTheCamera(place.latLng)
+                    placeDestinationMarker(place.latLng)
+
+                    log("Log: onActivityResult(): Destination: Location is" + place.latLng)
+
+                }
+                RESULT_ERROR -> {
+                    val status: Status = Autocomplete.getStatusFromIntent(data!!)
+                    log("Log: onActivityResult(): Destination: Status:" + status.statusMessage)
+                    makeToast("Error")
+                }
+
+                RESULT_CANCELED -> {
+                    log("Log: onActivityResult(): Destination: User Cancelled the operation")
+                }
             }
         }
     }
@@ -151,11 +201,11 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                 strAddress.append(fetchedAddress.getAddressLine(0)).append(" ")
                 log("getAddressFromLocation(): The address is $strAddress")
 
-                mAddress.text = strAddress.toString()
-                log("getAddressFromLocation(): Current Address is ${mAddress.text}")
+                mPickupAddress.text = strAddress.toString()
+                log("getAddressFromLocation(): Current Address is ${mPickupAddress.text}")
             } else {
                 log("getAddressFromLocation(): searching the current address")
-                mAddress.text = getString(R.string.searching_address)
+                mPickupAddress.text = getString(R.string.searching_address)
             }
 
         } catch (error: IOException) {
@@ -166,11 +216,45 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun createMarker(latLng: LatLng?) {
-        val marker: LatLng? = latLng
-        mMap.addMarker(MarkerOptions().position(marker!!))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker, 12.0f))
+    private fun placePickupMarker(latLng: LatLng?) {
+
+        if (mPickupCount > 0) {
+            if (mPickupMarker != null) {
+                mPickupMarker.remove()
+            }
+        }
+
+        mPickupMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng!!)
+                .title("Pickup Address")
+                .visible(true)
+        )
+        mPickupMarker.position = latLng
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
+
+        mPickupCount++
     }
+
+    private fun placeDestinationMarker(latLng: LatLng?) {
+
+        if (mDestinationCount > 0) {
+            if (mDestinationMarker != null) {
+                mDestinationMarker.remove()
+            }
+        }
+
+        mDestinationMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng!!)
+                .title("Destination Address")
+                .visible(true)
+        )
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
+        mDestinationCount++
+    }
+
 
     private fun updateTheCamera(latLng: LatLng?) {
         val updateCamera: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f)

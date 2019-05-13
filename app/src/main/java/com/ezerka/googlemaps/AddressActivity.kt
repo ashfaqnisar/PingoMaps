@@ -1,20 +1,23 @@
 package com.ezerka.googlemaps
 
 //Normal Imports
-
-//Maps Imports
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -48,6 +51,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mPickupCardView: CardView
     private lateinit var mDestinationAddress: TextView
     private lateinit var mDestinationCardView: CardView
+    private lateinit var mPlaceThePickup: Button
+    private lateinit var mGetMyLocationButton: FloatingActionButton
 
     //Map Variables
     private lateinit var mMapFragment: SupportMapFragment
@@ -59,7 +64,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mDestinationMarker: Marker
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var mLastLocation: Location
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +89,9 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mDestinationAddress.isSelected = true
         mDestinationAddress.setSingleLine(true)
 
+        mPlaceThePickup = findViewById(R.id.id_But_PlaceThePickup)
+        mGetMyLocationButton = findViewById(R.id.id_Float_But_GetMyLocation)
+
         mKey = getString(R.string.google_maps_key)
         mPickupCardView = findViewById(R.id.id_cardview_pickup)
         mDestinationCardView = findViewById(R.id.id_cardview_destination)
@@ -105,9 +112,15 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mPickupCardView.setOnClickListener {
             openPickupAutocomplete()
         }
+
         mDestinationCardView.setOnClickListener {
             openDestAutocomplete()
         }
+
+        mGetMyLocationButton.setOnClickListener {
+            getTheUserLocation()
+        }
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -118,7 +131,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val hyderabad = LatLng(17.3850, 78.4867)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
-
 
 
         /*try{
@@ -133,6 +145,25 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 */
         //isCameraIdle()
+    }
+
+    private fun getTheUserLocation() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            logError("Unable to assign the permissions")
+            makeToast("Please provide the permission to make the  application work")
+        }
+
+        mMap.isMyLocationEnabled = true
+
+        mFusedLocationProviderClient.lastLocation.addOnSuccessListener(this) { location ->
+            if (location != null) {
+                mLastLocation = location
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18f))
+            }
+        }
+
     }
 
     private fun openPickupAutocomplete() {
@@ -160,13 +191,13 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                     updateTheCamera(place.latLng)
                     placePickupMarker(place.latLng)
 
-                    makeToast("Log: onActivityResult(): Pickup: Location is" + place.latLng)
+                    makeToast("onActivityResult(): Pickup: Location is" + place.latLng)
                 }
                 RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
-                    log("Log: onActivityResult(): Pickup: Status: " + status.statusMessage)
+                    log("onActivityResult(): Pickup: Status: " + status.statusMessage)
                 }
-                RESULT_CANCELED -> log("Log: onActivityResult(): Pickup: User Cancelled the operation")
+                RESULT_CANCELED -> log("onActivityResult(): Pickup: User Cancelled the operation")
             }
         }
 
@@ -183,17 +214,17 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                     updateTheCamera(place.latLng)
                     placeDestinationMarker(place.latLng)
 
-                    log("Log: onActivityResult(): Destination: Location is" + place.latLng)
+                    log(" onActivityResult(): Destination: Location is" + place.latLng)
 
                 }
                 RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
-                    log("Log: onActivityResult(): Destination: Status:" + status.statusMessage)
+                    log(" onActivityResult(): Destination: Status:" + status.statusMessage)
                     makeToast("Error")
                 }
 
                 RESULT_CANCELED -> {
-                    log("Log: onActivityResult(): Destination: User Cancelled the operation")
+                    log("onActivityResult(): Destination: User Cancelled the operation")
                 }
             }
         }

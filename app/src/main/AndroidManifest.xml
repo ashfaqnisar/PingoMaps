@@ -17,9 +17,9 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ProvidePermissionActivity">
+        <activity android:name=".ui.ProvidePermissionActivity">
         </activity>
-        <activity android:name=".PermissionsActivity">
+        <activity android:name=".ui.PermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -39,11 +39,11 @@
                 android:value="@string/google_maps_key"/>
 
         <activity
-                android:name=".MapsActivity"
+                android:name=".ui.MapsActivity"
                 android:label="@string/title_activity_maps">
         </activity>
         <activity
-                android:name=".AddressActivity"
+                android:name=".ui.AddressActivity"
                 android:label="@string/title_activity_address">
         </activity>
     </application>

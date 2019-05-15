@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps
+package com.ezerka.googlemaps.ui
 
 import android.Manifest
 import android.content.Context
@@ -13,6 +13,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.ezerka.googlemaps.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory

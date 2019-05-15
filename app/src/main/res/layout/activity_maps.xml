@@ -11,7 +11,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/map"
-            tools:context=".MapsActivity"
+            tools:context=".ui.MapsActivity"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             map:layout_constraintBottom_toBottomOf="parent"
             map:layout_constraintEnd_toEndOf="parent"

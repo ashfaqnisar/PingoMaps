@@ -1,16 +1,19 @@
-package com.ezerka.googlemaps
+package com.ezerka.googlemaps.ui
 
 //Normal Imports
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
 import android.text.TextUtils
@@ -18,6 +21,11 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.ezerka.googlemaps.R
+import com.ezerka.googlemaps.util.Constants.Companion.ERROR_REQUEST
+import com.ezerka.googlemaps.util.Constants.Companion.PERMISSIONS_ENABLE_GPS_REQUEST
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -31,10 +39,12 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity.RESULT_ERROR
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.maps.DirectionsApiRequest
 import com.google.maps.GeoApiContext
+import com.google.maps.PendingResult
+import com.google.maps.model.DirectionsResult
 import java.io.IOException
 import java.util.*
-import com.google.maps.PendingResult.Callback as Callback1
 
 
 class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -44,7 +54,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private val mPickupRequestCode: Int = 1
     private val mDestinationRequestCode: Int = 2
     private lateinit var mContext: Context
-    private var mLocationPermissionGranted: Boolean = false
+    private var mLocationPermissionGranted: Boolean = true
+    private lateinit var mGoogleApiAvailability: GoogleApiAvailability
 
     //Normal Variables
     private lateinit var mKey: String
@@ -75,6 +86,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         assignTheViews()
         assignTheLinks()
+        assignTheMethods()
     }
 
     private fun assignTheViews() {
@@ -109,6 +121,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
+        mGoogleApiAvailability = GoogleApiAvailability.getInstance()
 
     }
 
@@ -137,6 +150,10 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    private fun assignTheMethods() {
+        checkMapServices()
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -161,8 +178,96 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+    private fun checkMapServices(): Boolean {
+        if (isGoogleServicesInstalled()) {
+            if (isGpsEnabled()) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isGoogleServicesInstalled(): Boolean {
+        log("isServicesOK():Checking google services version")
+
+        val available = mGoogleApiAvailability.isGooglePlayServicesAvailable(mContext)
+
+        when {
+            available == ConnectionResult.SUCCESS -> {
+                log("isServicesOK():The Google Play Services are working")
+                return true
+            }
+            mGoogleApiAvailability.isUserResolvableError(available) -> {
+                log("isServicesOK(): Error can be solved by the user")
+
+                val dialog: Dialog = mGoogleApiAvailability.getErrorDialog(this, available, ERROR_REQUEST)
+                dialog.show()
+            }
+            else -> makeToast("isServicesOK():You can't make services request")
+        }
+        return false
+    }
+
+    private fun isGpsEnabled(): Boolean {
+        val manager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps()
+            return false
+        }
+        return true
+
+    }
+
+    private fun buildAlertMessageNoGps() {
+        val alertBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
+
+        alertBuilder.setMessage("This App requires GPS to work, do you want to enable it?")
+            .setCancelable(false)
+            .setPositiveButton("Yes") { _, _ ->
+                //Here dialog and the marker are present
+                val openSettingsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivityForResult(openSettingsIntent, PERMISSIONS_ENABLE_GPS_REQUEST)
+            }
+
+        val alert: AlertDialog = alertBuilder.create()
+        alert.show()
+    }
+
+    private fun calculateDirections(pickup_marker: Marker?, destination_marker: Marker?) {
+        log("calculateDirections():Calculating the directions")
+
+        val pickupLatLng =
+            com.google.maps.model.LatLng(pickup_marker!!.position.latitude, pickup_marker.position.longitude)
+        val destinationLatLng =
+            com.google.maps.model.LatLng(destination_marker!!.position.latitude, destination_marker.position.longitude)
+
+        val directions = DirectionsApiRequest(mGeoApiContext)
+
+        directions.alternatives(true)
+
+        directions.origin(pickupLatLng)
+        directions.destination(destinationLatLng).setCallback(object : PendingResult.Callback<DirectionsResult> {
+
+            override fun onResult(result: DirectionsResult?) {
+                log("calculateDirections(): Result is successful")
+
+                log("Different Routes: ${result!!.routes[0]}")
+                log("Duration : ${result.routes[0].legs[0].duration}")
+                log("Distance: ${result.routes[0].legs[0].distance}")
+                log("Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
+            }
+
+            override fun onFailure(error: Throwable?) {
+                logError("calculateDirections():Error: ${error!!.localizedMessage}")
+            }
+        })
+
+    }
+
     private fun getTheUserLocation() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = false
             logError("Unable to assign the permissions")
             makeToast("Please provide the permission to make the  application work")
         }
@@ -179,7 +284,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
     }
-
 
     private fun openPickupAutocomplete() {
         val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(mContext)
@@ -243,6 +347,14 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
+
+        if (requestCode == PERMISSIONS_ENABLE_GPS_REQUEST) {
+            if (mLocationPermissionGranted) {
+                makeToast("Permissions Granted")
+            } else {
+                makeToast("Permissions Not Provided")
+            }
+        }
     }
 
 
@@ -285,7 +397,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     private fun placePickupMarker(latLng: LatLng?) {
 
         if (mPickupMarker != null) {
@@ -318,7 +429,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
     }
 
-
     private fun updateTheCamera(latLng: LatLng?) {
         val updateCamera: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
         log("updateTheCamera: Updating the camera")
@@ -337,5 +447,14 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun makeToast(toast: String) {
         log("Making a toast of $toast")
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (checkMapServices()) {
+            if (mLocationPermissionGranted) {
+                makeToast("Permissions Granted")
+            }
+        }
     }
 }

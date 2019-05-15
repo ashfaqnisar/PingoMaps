@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps
+package com.ezerka.googlemaps.ui
 
 import android.Manifest
 import android.content.Context
@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import com.ezerka.googlemaps.R
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken

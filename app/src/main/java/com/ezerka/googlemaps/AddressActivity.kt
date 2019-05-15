@@ -1,6 +1,7 @@
 package com.ezerka.googlemaps
 
 //Normal Imports
+
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -17,7 +18,6 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -31,8 +31,10 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity.RESULT_ERROR
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.maps.GeoApiContext
 import java.io.IOException
 import java.util.*
+import com.google.maps.PendingResult.Callback as Callback1
 
 
 class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -42,8 +44,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private val mPickupRequestCode: Int = 1
     private val mDestinationRequestCode: Int = 2
     private lateinit var mContext: Context
-    private var mDestinationCount: Int = 0
-    private var mPickupCount: Int = 0
+    private var mLocationPermissionGranted: Boolean = false
 
     //Normal Variables
     private lateinit var mKey: String
@@ -55,13 +56,15 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mGetMyLocationButton: FloatingActionButton
 
     //Map Variables
+    private var mPickupMarker: Marker? = null
+    private var mDestinationMarker: Marker? = null
+    private var mGeoApiContext: GeoApiContext? = null
+
     private lateinit var mMapFragment: SupportMapFragment
     private lateinit var mMap: GoogleMap
     private lateinit var mCenter: LatLng
     private lateinit var mPlacesClient: PlacesClient
     private lateinit var mFields: List<Place.Field>
-    private lateinit var mPickupMarker: Marker
-    private lateinit var mDestinationMarker: Marker
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var mLastLocation: Location
 
@@ -106,6 +109,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
+
     }
 
     private fun assignTheLinks() {
@@ -121,6 +125,16 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
             getTheUserLocation()
         }
 
+        mPlaceThePickup.setOnClickListener {
+            if (mPickupMarker != null && mDestinationMarker != null) {
+                makeToast("Calculating Directions")
+                //calculateDirections(mPickupMarker,mDestinationMarker)
+            } else {
+                makeToast("Please provide the pickup and destination address")
+            }
+
+        }
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -131,7 +145,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val hyderabad = LatLng(17.3850, 78.4867)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
-
 
         /*try{
             val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))
@@ -146,6 +159,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 */
         //isCameraIdle()
     }
+
 
     private fun getTheUserLocation() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -165,6 +179,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
     }
+
 
     private fun openPickupAutocomplete() {
         val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(mContext)
@@ -273,10 +288,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun placePickupMarker(latLng: LatLng?) {
 
-        if (mPickupCount > 0) {
-            if (mPickupMarker != null) {
-                mPickupMarker.remove()
-            }
+        if (mPickupMarker != null) {
+            mPickupMarker!!.remove()
         }
 
         mPickupMarker = mMap.addMarker(
@@ -285,18 +298,14 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                 .title("Pickup Address")
                 .visible(true)
         )
-        mPickupMarker.position = latLng
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
 
-        mPickupCount++
     }
 
     private fun placeDestinationMarker(latLng: LatLng?) {
 
-        if (mDestinationCount > 0) {
-            if (mDestinationMarker != null) {
-                mDestinationMarker.remove()
-            }
+        if (mDestinationMarker != null) {
+            mDestinationMarker!!.remove()
         }
 
         mDestinationMarker = mMap.addMarker(
@@ -307,7 +316,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         )
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
-        mDestinationCount++
     }
 
 

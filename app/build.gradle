@@ -35,6 +35,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'//Maps Dependency
     implementation 'com.google.android.libraries.places:places:1.1.0'//Places Dependency
     implementation 'com.google.android.gms:play-services-location:16.0.0' //Location Dependency
+    implementation 'com.google.maps:google-maps-services:0.9.3' //Directions Dependency
+    implementation 'com.google.maps.android:android-maps-utils:0.5' //Custom Markers Dependency
 
 
     implementation "com.karumi:dexter:4.2.0"//Dexter Runtime Permissions

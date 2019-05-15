@@ -43,6 +43,7 @@ import com.google.maps.DirectionsApiRequest
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.model.DirectionsResult
+import com.google.maps.model.TravelMode
 import java.io.IOException
 import java.util.*
 
@@ -123,6 +124,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mGoogleApiAvailability = GoogleApiAvailability.getInstance()
 
+
     }
 
     private fun assignTheLinks() {
@@ -141,7 +143,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         mPlaceThePickup.setOnClickListener {
             if (mPickupMarker != null && mDestinationMarker != null) {
                 makeToast("Calculating Directions")
-                //calculateDirections(mPickupMarker,mDestinationMarker)
+                calculateDirections(mPickupMarker, mDestinationMarker)
             } else {
                 makeToast("Please provide the pickup and destination address")
             }
@@ -163,6 +165,11 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         val hyderabad = LatLng(17.3850, 78.4867)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
 
+        if (mGeoApiContext == null) {
+            mGeoApiContext = GeoApiContext.Builder()
+                .apiKey(mKey)
+                .build()
+        }
         /*try{
             val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))
 
@@ -245,17 +252,19 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         val directions = DirectionsApiRequest(mGeoApiContext)
 
         directions.alternatives(true)
+        directions.mode(TravelMode.DRIVING)
 
         directions.origin(pickupLatLng)
-        directions.destination(destinationLatLng).setCallback(object : PendingResult.Callback<DirectionsResult> {
+        directions.destination(destinationLatLng)
+            .setCallback(object : PendingResult.Callback<DirectionsResult> {
 
             override fun onResult(result: DirectionsResult?) {
                 log("calculateDirections(): Result is successful")
 
-                log("Different Routes: ${result!!.routes[0]}")
-                log("Duration : ${result.routes[0].legs[0].duration}")
-                log("Distance: ${result.routes[0].legs[0].distance}")
-                log("Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
+                log("calculateDirections(): Different Routes: ${result!!.routes[0]}")
+                log("calculateDirections(): Duration : ${result.routes[0].legs[0].duration}")
+                log("calculateDirections(): Distance: ${result.routes[0].legs[0].distance}")
+                log("calculateDirections(): Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
             }
 
             override fun onFailure(error: Throwable?) {
@@ -268,7 +277,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getTheUserLocation() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = false
-            logError("Unable to assign the permissions")
+            logError("getTheUserLocation(): Unable to assign the permissions")
             makeToast("Please provide the permission to make the  application work")
         }
 
@@ -392,7 +401,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         } catch (error: IOException) {
             error.stackTrace
-            logError("IOException: Error: $error")
+            logError("getAddressFromLocation():IOException: Error: $error")
             makeToast("Could Not Get Address $error")
         }
     }
@@ -456,5 +465,10 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                 makeToast("Permissions Granted")
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        log("onStart():Starting the Activity")
     }
 }

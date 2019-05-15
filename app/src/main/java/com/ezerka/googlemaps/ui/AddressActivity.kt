@@ -12,6 +12,8 @@ import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -30,9 +32,7 @@ import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -42,10 +42,13 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.maps.DirectionsApiRequest
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
+import com.google.maps.internal.PolylineEncoding
 import com.google.maps.model.DirectionsResult
+import com.google.maps.model.DirectionsRoute
 import com.google.maps.model.TravelMode
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -265,6 +268,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                 log("calculateDirections(): Duration : ${result.routes[0].legs[0].duration}")
                 log("calculateDirections(): Distance: ${result.routes[0].legs[0].distance}")
                 log("calculateDirections(): Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
+
+                addPolyLinesToTheMap(result)
             }
 
             override fun onFailure(error: Throwable?) {
@@ -272,6 +277,34 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
+    }
+
+    private fun addPolyLinesToTheMap(result: DirectionsResult) {
+        Handler(Looper.getMainLooper()).post(object : Runnable {
+            override fun run() {
+                log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
+
+                for (route: DirectionsRoute in result.routes) {
+                    log("addPolyLinesToTheMap(): Run: ForLoop: Legs: ${route.legs[0]}")
+
+                    val decodedPath: List<com.google.maps.model.LatLng> =
+                        PolylineEncoding.decode(route.overviewPolyline.encodedPath)
+
+                    val newDecodedPath: MutableList<LatLng> = ArrayList()
+
+                    for (latlng: com.google.maps.model.LatLng in decodedPath) {
+                        log("addPolyLinesToTheMap(): Run: ForLoop: laltng: $latlng")
+
+                        newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
+                    }
+
+                    val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
+                    polyline.color = getColor(R.color.colorAccent)
+                    polyline.isClickable = true
+
+                }
+            }
+        })
     }
 
     private fun getTheUserLocation() {

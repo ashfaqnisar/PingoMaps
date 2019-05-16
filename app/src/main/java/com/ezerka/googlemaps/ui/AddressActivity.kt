@@ -24,8 +24,9 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.ezerka.googlemaps.R
-import com.ezerka.googlemaps.util.Constants.Companion.ERROR_REQUEST
-import com.ezerka.googlemaps.util.Constants.Companion.PERMISSIONS_ENABLE_GPS_REQUEST
+import com.ezerka.googlemaps.models.PolylineData
+import com.ezerka.googlemaps.util.Constants.ERROR_REQUEST
+import com.ezerka.googlemaps.util.Constants.PERMISSIONS_ENABLE_GPS_REQUEST
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.Status
@@ -51,7 +52,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
+class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
+
 
     //Constant variables
     private val TAG: String = "AddressActivity: "
@@ -69,6 +71,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mDestinationCardView: CardView
     private lateinit var mPlaceThePickup: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
+    private lateinit var mPolylineDataList: ArrayList<PolylineData>
 
     //Map Variables
     private var mPickupMarker: Marker? = null
@@ -127,6 +130,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mGoogleApiAvailability = GoogleApiAvailability.getInstance()
 
+        mPolylineDataList = ArrayList()
 
     }
 
@@ -173,6 +177,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                 .apiKey(mKey)
                 .build()
         }
+
+        mMap.setOnPolylineClickListener(this)
         /*try{
             val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))
 
@@ -280,31 +286,52 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun addPolyLinesToTheMap(result: DirectionsResult) {
-        Handler(Looper.getMainLooper()).post(object : Runnable {
-            override fun run() {
-                log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
+        Handler(Looper.getMainLooper()).post {
+            log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
 
-                for (route: DirectionsRoute in result.routes) {
-                    log("addPolyLinesToTheMap(): Run: ForLoop: Legs: ${route.legs[0]}")
-
-                    val decodedPath: List<com.google.maps.model.LatLng> =
-                        PolylineEncoding.decode(route.overviewPolyline.encodedPath)
-
-                    val newDecodedPath: MutableList<LatLng> = ArrayList()
-
-                    for (latlng: com.google.maps.model.LatLng in decodedPath) {
-                        log("addPolyLinesToTheMap(): Run: ForLoop: laltng: $latlng")
-
-                        newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
-                    }
-
-                    val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
-                    polyline.color = getColor(R.color.colorAccent)
-                    polyline.isClickable = true
-
+            if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
+                for (polylineData: PolylineData in mPolylineDataList) {
+                    polylineData.polyline.remove()
                 }
+                mPolylineDataList.clear()
+                mPolylineDataList = ArrayList()
             }
-        })
+
+            for (route: DirectionsRoute in result.routes) {
+                log("addPolyLinesToTheMap(): Run: ForLoop: Legs: ${route.legs[0]}")
+
+                val decodedPath: List<com.google.maps.model.LatLng> =
+                    PolylineEncoding.decode(route.overviewPolyline.encodedPath)
+
+                val newDecodedPath: MutableList<LatLng> = ArrayList()
+
+                for (latlng: com.google.maps.model.LatLng in decodedPath) {
+                    log("addPolyLinesToTheMap(): Run: ForLoop: laltng: $latlng")
+
+                    newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
+                }
+
+                val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
+                polyline.color = getColor(R.color.colorPrimary)
+                polyline.isClickable = true
+
+                mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
+            }
+        }
+    }
+
+    override fun onPolylineClick(polyline: Polyline?) {
+        for (polylineData: PolylineData in mPolylineDataList) {
+            log("onPolylineClick(): $polylineData")
+
+            if (polyline!!.id == polylineData.polyline.id) {
+                polylineData.polyline.color = getColor(R.color.colorAccent)
+                polylineData.polyline.zIndex = 1F
+            } else {
+                polylineData.polyline.color = getColor(R.color.colorPrimary)
+                polylineData.polyline.zIndex = 0F
+            }
+        }
     }
 
     private fun getTheUserLocation() {
@@ -352,6 +379,9 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
                     updateTheCamera(place.latLng)
                     placePickupMarker(place.latLng)
 
+                    if (mPickupMarker != null && mDestinationMarker != null) {
+                        removePolylinesPresent()
+                    }
                     makeToast("onActivityResult(): Pickup: Location is" + place.latLng)
                 }
                 RESULT_ERROR -> {
@@ -374,6 +404,11 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     updateTheCamera(place.latLng)
                     placeDestinationMarker(place.latLng)
+
+                    if (mPickupMarker != null && mDestinationMarker != null) {
+                        removePolylinesPresent()
+                    }
+
 
                     log(" onActivityResult(): Destination: Location is" + place.latLng)
 
@@ -399,6 +434,16 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun removePolylinesPresent() {
+        log("removePolyLinesPresent(): Removing the polylines present")
+        if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
+            for (polylineData: PolylineData in mPolylineDataList) {
+                polylineData.polyline.remove()
+            }
+            mPolylineDataList.clear()
+            mPolylineDataList = ArrayList()
+        }
+    }
 
     private fun isCameraIdle() {
         mMap.setOnCameraIdleListener {

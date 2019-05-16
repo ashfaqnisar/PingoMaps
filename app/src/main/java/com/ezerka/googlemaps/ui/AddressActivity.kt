@@ -46,6 +46,7 @@ import com.google.maps.PendingResult
 import com.google.maps.internal.PolylineEncoding
 import com.google.maps.model.DirectionsResult
 import com.google.maps.model.DirectionsRoute
+import com.google.maps.model.Duration
 import com.google.maps.model.TravelMode
 import java.io.IOException
 import java.util.*
@@ -151,11 +152,21 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
             if (mPickupMarker != null && mDestinationMarker != null) {
                 makeToast("Calculating Directions")
                 calculateDirections(mPickupMarker, mDestinationMarker)
+                val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
+                val mDestinationMarkerLatLng =
+                    LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
+
+                adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
+
             } else {
                 makeToast("Please provide the pickup and destination address")
             }
 
         }
+
+    }
+
+    private fun adjustTheCameraToBounds(mPickupLatLng: LatLng, mDestinationLatLng: LatLng) {
 
     }
 
@@ -267,21 +278,21 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         directions.destination(destinationLatLng)
             .setCallback(object : PendingResult.Callback<DirectionsResult> {
 
-            override fun onResult(result: DirectionsResult?) {
-                log("calculateDirections(): Result is successful")
+                override fun onResult(result: DirectionsResult?) {
+                    log("calculateDirections(): Result is successful")
 
-                log("calculateDirections(): Different Routes: ${result!!.routes[0]}")
-                log("calculateDirections(): Duration : ${result.routes[0].legs[0].duration}")
-                log("calculateDirections(): Distance: ${result.routes[0].legs[0].distance}")
-                log("calculateDirections(): Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
+                    log("calculateDirections(): Different Routes: ${result!!.routes[0]}")
+                    log("calculateDirections(): Duration : ${result.routes[0].legs[0].duration}")
+                    log("calculateDirections(): Distance: ${result.routes[0].legs[0].distance}")
+                    log("calculateDirections(): Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
 
-                addPolyLinesToTheMap(result)
-            }
+                    addPolyLinesToTheMap(result)
+                }
 
-            override fun onFailure(error: Throwable?) {
-                logError("calculateDirections():Error: ${error!!.localizedMessage}")
-            }
-        })
+                override fun onFailure(error: Throwable?) {
+                    logError("calculateDirections():Error: ${error!!.localizedMessage}")
+                }
+            })
 
     }
 
@@ -321,12 +332,17 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     }
 
     override fun onPolylineClick(polyline: Polyline?) {
-        for (polylineData: PolylineData in mPolylineDataList) {
+        for ((index, polylineData: PolylineData) in mPolylineDataList.withIndex()) {
+
             log("onPolylineClick(): $polylineData")
 
             if (polyline!!.id == polylineData.polyline.id) {
                 polylineData.polyline.color = getColor(R.color.colorAccent)
                 polylineData.polyline.zIndex = 1F
+
+                val polylineLatLng = LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng)
+
+                placeMarkerWithData(polylineLatLng, index + 1, polylineData.leg.duration)
             } else {
                 polylineData.polyline.color = getColor(R.color.colorPrimary)
                 polylineData.polyline.zIndex = 0F
@@ -493,10 +509,10 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         mPickupMarker = mMap.addMarker(
             MarkerOptions()
                 .position(latLng!!)
-                .title("Pickup Address")
+                .title("Pickup")
                 .visible(true)
         )
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
+        updateTheCamera(latLng)
 
     }
 
@@ -509,11 +525,30 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         mDestinationMarker = mMap.addMarker(
             MarkerOptions()
                 .position(latLng!!)
-                .title("Destination Address")
+                .title("Destination")
                 .visible(true)
         )
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f))
+        updateTheCamera(latLng)
+    }
+
+    private fun placeMarkerWithData(latLng: LatLng?, index: Int, duration: Duration) {
+        var marker: Marker? = null
+
+        when {
+            marker != null -> marker.remove()
+        }
+
+        marker = mMap.addMarker(
+            MarkerOptions()
+                .title("Trip : $index")
+                .snippet("Duration: $duration")
+                .position(latLng!!)
+                .draggable(true)
+                .visible(true)
+        )
+        updateTheCamera(latLng)
+        marker!!.showInfoWindow()
     }
 
     private fun updateTheCamera(latLng: LatLng?) {
@@ -539,9 +574,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     override fun onResume() {
         super.onResume()
         if (checkMapServices()) {
-            if (mLocationPermissionGranted) {
-                makeToast("Permissions Granted")
-            }
+            makeToast("GPS Enabled")
         }
     }
 

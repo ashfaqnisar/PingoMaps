@@ -8,7 +8,6 @@
         android:fitsSystemWindows="true"
         tools:openDrawer="start">
 
-
     <android.support.v7.widget.CardView
             android:id="@+id/id_cardview_pickup"
             android:layout_width="match_parent"
@@ -18,9 +17,10 @@
             android:stateListAnimator="@animator/lift_on_touch"
             app:cardCornerRadius="5dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent">
 
 
@@ -80,33 +80,33 @@
     </android.support.v7.widget.CardView>
 
 
-    <FrameLayout
+    <fragment
+            android:id="@+id/mapFragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/frameLayout">
-        <fragment
-                android:id="@+id/mapFragment"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="620dp"
-                android:tag="tag_map_fragment" android:layout_gravity="center"/>
+            android:layout_height="0dp"
+            android:tag="tag_map_fragment" android:layout_gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/id_But_PlaceThePickup" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+    </fragment>
 
-        <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
 
-            <ImageView
-                    android:id="@+id/centerMarker"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_placeholder"
-                    android:contentDescription="@string/centermarker"/>
+    <ImageView
+            android:id="@+id/centerMarker"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_placeholder"
+            android:contentDescription="@string/centermarker"
+            app:layout_constraintEnd_toEndOf="@+id/mapFragment" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="@+id/mapFragment"
+            app:layout_constraintBottom_toBottomOf="@+id/mapFragment"
+            app:layout_constraintTop_toTopOf="@+id/mapFragment" app:layout_constraintHorizontal_bias="0.487"
+            app:layout_constraintVertical_bias="0.456">
+    </ImageView>
 
-        </FrameLayout>
 
-    </FrameLayout>
     <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -128,8 +128,10 @@
             android:background="@drawable/shape"
             android:layout_height="58dp"
             android:id="@+id/id_But_PlaceThePickup"
-            app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    <android.support.constraint.Guideline android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                          android:id="@+id/guideline2" app:layout_constraintGuide_begin="334dp"
+                                          android:orientation="horizontal"/>
 </android.support.constraint.ConstraintLayout>

@@ -24,6 +24,7 @@ class PermissionsActivity : AppCompatActivity() {
 
     //Normal Variables
     private lateinit var mProvideButton: Button
+    private lateinit var mOpenNavigationButton: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,12 +50,18 @@ class PermissionsActivity : AppCompatActivity() {
         mContext = applicationContext
 
         mProvideButton = findViewById(R.id.id_But_Provide_Permissions)
+        mOpenNavigationButton = findViewById(R.id.id_But_Open_Navigation_Drawer)
 
     }
 
     private fun assignTheLinks() {
         mProvideButton.setOnClickListener {
             requestTheMapPermission()
+        }
+
+        mOpenNavigationButton.setOnClickListener {
+            log("assignTheLinks():Starting the Navigation Activity")
+            startTheActivity(NavigationActivity::class.java)
         }
 
     }

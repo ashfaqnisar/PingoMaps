@@ -17,6 +17,18 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity
+                android:name=".ui.AddressActivity"
+                android:label="@string/title_activity_navigation"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+                android:name=".ui.NavigationActivity"
+                android:label="@string/title_activity_navigation"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
         <activity android:name=".ui.ProvidePermissionActivity">
         </activity>
         <activity android:name=".ui.PermissionsActivity">
@@ -41,10 +53,6 @@
         <activity
                 android:name=".ui.MapsActivity"
                 android:label="@string/title_activity_maps">
-        </activity>
-        <activity
-                android:name=".ui.AddressActivity"
-                android:label="@string/title_activity_address">
         </activity>
     </application>
 

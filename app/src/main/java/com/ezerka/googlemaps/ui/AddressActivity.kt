@@ -17,11 +17,18 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.NavigationView
+import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -55,7 +62,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
+class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
+    NavigationView.OnNavigationItemSelectedListener {
+
 
 
     //Constant variables
@@ -72,6 +81,10 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     private lateinit var mPickupCardView: CardView
     private lateinit var mDestinationAddress: TextView
     private lateinit var mDestinationCardView: CardView
+    private lateinit var mDrawerLayout: DrawerLayout
+    private lateinit var mNavigationView: NavigationView
+    private lateinit var mToggle: ActionBarDrawerToggle
+    private lateinit var mToolBar: Toolbar
     private lateinit var mPlaceTheRide: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
     private lateinit var mPolylineDataList: ArrayList<PolylineData>
@@ -93,7 +106,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_findaddress)
+        setContentView(R.layout.activity_navigation)
 
         assignTheViews()
         assignTheLinks()
@@ -102,6 +115,19 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
     private fun assignTheViews() {
         mContext = applicationContext
+
+        mToolBar = findViewById(R.id.toolbar)
+        setSupportActionBar(mToolBar)
+
+        mDrawerLayout = findViewById(R.id.id_Layout_DrawerLayout)
+        mNavigationView = findViewById(R.id.id_View_NavigationView)
+        mToggle =
+            ActionBarDrawerToggle(this, mDrawerLayout, mToolBar, R.string.open_the_drawer, R.string.close_the_drawer)
+
+        mDrawerLayout.addDrawerListener(mToggle)
+        mToggle.syncState()
+
+        mNavigationView.setNavigationItemSelectedListener(this)
 
         mPickupAddress = findViewById(R.id.id_text_pickup_address)
         mPickupAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
@@ -173,6 +199,51 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
         }
 
+    }
+
+    override fun onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.navigation, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item!!.itemId) {
+            R.id.action_settings -> {
+                makeToast("Clicked Settings")
+                return true
+            }
+            R.id.action_list -> {
+                makeToast("Clicked List")
+                return true
+            }
+            else -> {
+                return super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
+    override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
+        when (menuItem.itemId) {
+            R.id.nav_home -> {
+                makeToast("Home Clicked")
+            }
+            R.id.nav_gallery -> {
+                makeToast("Gallery Clicked")
+            }
+            R.id.nav_send -> {
+                makeToast("Send Clicked")
+            }
+        }
+        mDrawerLayout.closeDrawer(GravityCompat.START)
+        return true
     }
 
     private fun adjustTheCameraToBounds(mPickupLatLng: LatLng, mDestinationLatLng: LatLng) {
@@ -405,12 +476,10 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                     mLastLocation = location
                     val currentLatLng = LatLng(location.latitude, location.longitude)
 
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18f))
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
                 }
             }
         }
-
-
 
     }
 

@@ -3,6 +3,8 @@ package com.ezerka.googlemaps.ui
 //Normal Imports
 
 import android.Manifest
+import android.animation.AnimatorInflater
+import android.animation.StateListAnimator
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -70,9 +72,10 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     private lateinit var mPickupCardView: CardView
     private lateinit var mDestinationAddress: TextView
     private lateinit var mDestinationCardView: CardView
-    private lateinit var mPlaceThePickup: Button
+    private lateinit var mPlaceTheRide: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
     private lateinit var mPolylineDataList: ArrayList<PolylineData>
+    private lateinit var mStateListAnimator: StateListAnimator
 
     //Map Variables
     private var mPickupMarker: Marker? = null
@@ -102,22 +105,24 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
         mPickupAddress = findViewById(R.id.id_text_pickup_address)
         mPickupAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
-        mPickupAddress.marqueeRepeatLimit = -1
+        mPickupAddress.marqueeRepeatLimit = 1
         mPickupAddress.isSelected = true
         mPickupAddress.setSingleLine(true)
 
         mDestinationAddress = findViewById(R.id.id_text_destination_address)
         mDestinationAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
-        mDestinationAddress.marqueeRepeatLimit = -1
+        mDestinationAddress.marqueeRepeatLimit = 1
         mDestinationAddress.isSelected = true
         mDestinationAddress.setSingleLine(true)
 
-        mPlaceThePickup = findViewById(R.id.id_But_PlaceThePickup)
+        mPlaceTheRide = findViewById(R.id.id_But_PlaceThePickup)
         mGetMyLocationButton = findViewById(R.id.id_Float_But_GetMyLocation)
 
         mKey = getString(R.string.google_maps_key)
         mPickupCardView = findViewById(R.id.id_cardview_pickup)
         mDestinationCardView = findViewById(R.id.id_cardview_destination)
+
+        mStateListAnimator = AnimatorInflater.loadStateListAnimator(mContext, R.animator.lift_on_touch)
 
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, mKey)
@@ -137,21 +142,25 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
     private fun assignTheLinks() {
         mPickupCardView.setOnClickListener {
+            log("assignTheLinks: mPickupCardView Listener")
             openPickupAutocomplete()
         }
 
         mDestinationCardView.setOnClickListener {
+            log("assignTheLinks(): mDestinationCardview Listener")
             openDestAutocomplete()
         }
 
         mGetMyLocationButton.setOnClickListener {
+            log("assignTheLinks(): mGetMyLocationButton")
             getTheUserLocation()
         }
 
-        mPlaceThePickup.setOnClickListener {
+        mPlaceTheRide.setOnClickListener {
             if (mPickupMarker != null && mDestinationMarker != null) {
                 makeToast("Calculating Directions")
                 calculateDirections(mPickupMarker, mDestinationMarker)
+
                 val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
                 val mDestinationMarkerLatLng =
                     LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
@@ -167,7 +176,21 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     }
 
     private fun adjustTheCameraToBounds(mPickupLatLng: LatLng, mDestinationLatLng: LatLng) {
+        val builder = LatLngBounds.builder()
 
+        //Calculating the min and max bound
+        builder.include(mPickupLatLng)
+        builder.include(mDestinationLatLng)
+
+        val latlngBounds = builder.build()
+
+        val width: Int = resources.displayMetrics.widthPixels
+        val height: Int = resources.displayMetrics.heightPixels
+
+        val padding: Int = (width * 0.20).toInt()
+
+        val cameraUpdate: CameraUpdate = (CameraUpdateFactory.newLatLngBounds(latlngBounds, width, height, padding))
+        mMap.animateCamera(cameraUpdate)
     }
 
     private fun assignTheMethods() {
@@ -249,16 +272,32 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     private fun buildAlertMessageNoGps() {
         val alertBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
 
-        alertBuilder.setMessage("This App requires GPS to work, do you want to enable it?")
-            .setCancelable(false)
+
+        alertBuilder
+            .setTitle("No Location Access")
+            .setMessage("Without the GPS, we will not be able to find your location. Do you want to enable it?")
+            .setNegativeButton("No") { _, _ ->
+                log("buildAlertMessageNoGps():User clicked No")
+            }
             .setPositiveButton("Yes") { _, _ ->
                 //Here dialog and the marker are present
                 val openSettingsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivityForResult(openSettingsIntent, PERMISSIONS_ENABLE_GPS_REQUEST)
             }
 
-        val alert: AlertDialog = alertBuilder.create()
-        alert.show()
+        val alertDialog: AlertDialog = alertBuilder.create()
+
+        alertDialog.setOnCancelListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.setOnShowListener {
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.colorPrimary))
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.colorPrimary))
+
+        }
+
+        alertDialog.show()
     }
 
     private fun calculateDirections(pickup_marker: Marker?, destination_marker: Marker?) {
@@ -356,17 +395,22 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
             logError("getTheUserLocation(): Unable to assign the permissions")
             makeToast("Please provide the permission to make the  application work")
         }
+        if (!isGpsEnabled()) {
+            makeToast("Please enable the GPS to find your location")
+        } else {
+            mMap.isMyLocationEnabled = true
 
-        mMap.isMyLocationEnabled = true
+            mFusedLocationProviderClient.lastLocation.addOnSuccessListener(this) { location ->
+                if (location != null) {
+                    mLastLocation = location
+                    val currentLatLng = LatLng(location.latitude, location.longitude)
 
-        mFusedLocationProviderClient.lastLocation.addOnSuccessListener(this) { location ->
-            if (location != null) {
-                mLastLocation = location
-                val currentLatLng = LatLng(location.latitude, location.longitude)
-
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18f))
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18f))
+                }
             }
         }
+
+
 
     }
 
@@ -392,7 +436,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                     mPickupAddress.text = address
 
 
-                    updateTheCamera(place.latLng)
+                    updateTheCamera(place.latLng, 12F)
                     placePickupMarker(place.latLng)
 
                     if (mPickupMarker != null && mDestinationMarker != null) {
@@ -418,7 +462,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                     mDestinationAddress.text = address
 
 
-                    updateTheCamera(place.latLng)
+                    updateTheCamera(place.latLng, 12F)
                     placeDestinationMarker(place.latLng)
 
                     if (mPickupMarker != null && mDestinationMarker != null) {
@@ -466,11 +510,12 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
             mCenter = mMap.cameraPosition.target
             log("cameraIdle(): Getting the data from the mCenter ")
             log("Center Details: " + mCenter.latitude + "," + mCenter.longitude)
-            getAddressFromLocation(mCenter.latitude, mCenter.longitude)
+            var address: String = getAddressFromLocation(mCenter.latitude, mCenter.longitude)
+
         }
     }
 
-    private fun getAddressFromLocation(latitude: Double, longitude: Double) {
+    private fun getAddressFromLocation(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(mContext, Locale.ENGLISH)
 
         try {
@@ -486,17 +531,18 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                 strAddress.append(fetchedAddress.getAddressLine(0)).append(" ")
                 log("getAddressFromLocation(): The address is $strAddress")
 
-                mPickupAddress.text = strAddress.toString()
-                log("getAddressFromLocation(): Current Address is ${mPickupAddress.text}")
+                return strAddress.toString()
+
             } else {
                 log("getAddressFromLocation(): searching the current address")
-                mPickupAddress.text = getString(R.string.searching_address)
+                return getString(R.string.searching_address)
             }
 
         } catch (error: IOException) {
             error.stackTrace
             logError("getAddressFromLocation():IOException: Error: $error")
             makeToast("Could Not Get Address $error")
+            return "Could Not Get the Address"
         }
     }
 
@@ -512,7 +558,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                 .title("Pickup")
                 .visible(true)
         )
-        updateTheCamera(latLng)
+        updateTheCamera(latLng, 15F)
 
     }
 
@@ -529,7 +575,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                 .visible(true)
         )
 
-        updateTheCamera(latLng)
+        updateTheCamera(latLng, 15F)
     }
 
     private fun placeMarkerWithData(latLng: LatLng?, index: Int, duration: Duration) {
@@ -547,12 +593,12 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                 .draggable(true)
                 .visible(true)
         )
-        updateTheCamera(latLng)
+        updateTheCamera(latLng, 15F)
         marker!!.showInfoWindow()
     }
 
-    private fun updateTheCamera(latLng: LatLng?) {
-        val updateCamera: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
+    private fun updateTheCamera(latLng: LatLng?, zoom: Float) {
+        val updateCamera: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom)
         log("updateTheCamera: Updating the camera")
         mMap.animateCamera(updateCamera)
     }

@@ -17,20 +17,15 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.BookingInputsActivity">
+        </activity>
+
         <activity
-                android:name=".ui.AddressActivity"
+                android:name=".ui.MainActivity"
                 android:label="@string/title_activity_navigation"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-        <activity
-                android:name=".ui.NavigationActivity"
-                android:label="@string/title_activity_navigation"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
-        <activity android:name=".ui.ProvidePermissionActivity">
-        </activity>
         <activity android:name=".ui.PermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -50,10 +45,6 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key"/>
 
-        <activity
-                android:name=".ui.MapsActivity"
-                android:label="@string/title_activity_maps">
-        </activity>
     </application>
 
 </manifest>

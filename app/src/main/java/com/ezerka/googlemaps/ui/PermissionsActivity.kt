@@ -7,7 +7,9 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import com.ezerka.googlemaps.R
 import com.karumi.dexter.Dexter
@@ -24,7 +26,7 @@ class PermissionsActivity : AppCompatActivity() {
 
     //Normal Variables
     private lateinit var mProvideButton: Button
-    private lateinit var mOpenNavigationButton: Button
+    private lateinit var mProvidePermissionsText: TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +41,7 @@ class PermissionsActivity : AppCompatActivity() {
 
     private fun checkThePermissions() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startTheActivity(AddressActivity::class.java)
+            startTheActivity(MainActivity::class.java)
             makeToast("Permissions Granted")
         } else {
             makeToast("Permissions Not Granted")
@@ -50,18 +52,13 @@ class PermissionsActivity : AppCompatActivity() {
         mContext = applicationContext
 
         mProvideButton = findViewById(R.id.id_But_Provide_Permissions)
-        mOpenNavigationButton = findViewById(R.id.id_But_Open_Navigation_Drawer)
+        mProvidePermissionsText = findViewById(R.id.id_Text_Provide_Permission)
 
     }
 
     private fun assignTheLinks() {
         mProvideButton.setOnClickListener {
             requestTheMapPermission()
-        }
-
-        mOpenNavigationButton.setOnClickListener {
-            log("assignTheLinks():Starting the Navigation Activity")
-            startTheActivity(NavigationActivity::class.java)
         }
 
     }
@@ -83,13 +80,15 @@ class PermissionsActivity : AppCompatActivity() {
                     if (reportResult.areAllPermissionsGranted()) {
                         log("All permissions are granted")
                         makeToast("All Permissions Are Granted")
-                        startTheActivity(AddressActivity::class.java)
+                        startTheActivity(MainActivity::class.java)
+
                     }
 
                     if (reportResult.isAnyPermissionPermanentlyDenied) {
                         logError("(reportResult)+Unable to grant all the permission")
                         makeToast("Unable to provide all the permissions")
-                        startTheActivity(ProvidePermissionActivity::class.java)
+                        mProvidePermissionsText.visibility = View.VISIBLE
+
                     }
 
                 }

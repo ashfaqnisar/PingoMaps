@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.ezerka.googlemaps.R
 
-class ProvidePermissionActivity : AppCompatActivity() {
+class BookingInputsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_provide_permission)
+        setContentView(R.layout.activity_booking_inputs)
     }
 }

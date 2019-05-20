@@ -43,6 +43,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -53,22 +54,19 @@ import com.google.maps.DirectionsApiRequest
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.internal.PolylineEncoding
-import com.google.maps.model.DirectionsResult
-import com.google.maps.model.DirectionsRoute
-import com.google.maps.model.Duration
-import com.google.maps.model.TravelMode
+import com.google.maps.model.*
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
     NavigationView.OnNavigationItemSelectedListener {
 
 
 
     //Constant variables
-    private val TAG: String = "AddressActivity: "
+    private val TAG: String = "MainActivity: "
     private val mPickupRequestCode: Int = 1
     private val mDestinationRequestCode: Int = 2
     private lateinit var mContext: Context
@@ -88,6 +86,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
     private lateinit var mPlaceTheRide: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
     private lateinit var mPolylineDataList: ArrayList<PolylineData>
+    private var small: ArrayList<Distance> = ArrayList()
     private lateinit var mStateListAnimator: StateListAnimator
 
     //Map Variables
@@ -106,7 +105,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_navigation)
+        setContentView(R.layout.activity_main)
 
         assignTheViews()
         assignTheLinks()
@@ -184,14 +183,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
         mPlaceTheRide.setOnClickListener {
             if (mPickupMarker != null && mDestinationMarker != null) {
-                makeToast("Calculating Directions")
-                calculateDirections(mPickupMarker, mDestinationMarker)
-
-                val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
-                val mDestinationMarkerLatLng =
-                    LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
-
-                adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
+                startTheActivity(BookingInputsActivity::class.java)
 
             } else {
                 makeToast("Please provide the pickup and destination address")
@@ -266,24 +258,38 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
     private fun assignTheMethods() {
         checkMapServices()
+
+    }
+
+    private fun placeTheDirections() {
+        if (mPickupMarker != null && mDestinationMarker != null) {
+            makeToast("assignTheMethods(): Calculating Directions")
+            calculateDirections(mPickupMarker, mDestinationMarker)
+
+            val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
+            val mDestinationMarkerLatLng =
+                LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
+
+            adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mMap.uiSettings.isZoomControlsEnabled = true
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
 
         val hyderabad = LatLng(17.3850, 78.4867)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
 
         if (mGeoApiContext == null) {
-            mGeoApiContext = GeoApiContext.Builder()
+            mGeoApiContext = GeoApiContext.Builder()//Used for fetching the directions
                 .apiKey(mKey)
                 .build()
         }
 
         mMap.setOnPolylineClickListener(this)
+        mMap.uiSettings.isZoomControlsEnabled = false
         /*try{
             val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))
 
@@ -410,24 +416,20 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         Handler(Looper.getMainLooper()).post {
             log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
 
-            if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
-                for (polylineData: PolylineData in mPolylineDataList) {
-                    polylineData.polyline.remove()
-                }
-                mPolylineDataList.clear()
-                mPolylineDataList = ArrayList()
-            }
+            removeThePreviousPolylines()
+            log("Routes: ${result.routes[0].legs[0].distance}")
+
+            findTheShortestRoute(result.routes)
 
             for (route: DirectionsRoute in result.routes) {
                 log("addPolyLinesToTheMap(): Run: ForLoop: Legs: ${route.legs[0]}")
-
                 val decodedPath: List<com.google.maps.model.LatLng> =
                     PolylineEncoding.decode(route.overviewPolyline.encodedPath)
 
                 val newDecodedPath: MutableList<LatLng> = ArrayList()
 
                 for (latlng: com.google.maps.model.LatLng in decodedPath) {
-                    log("addPolyLinesToTheMap(): Run: ForLoop: laltng: $latlng")
+                    log("addPolyLinesToTheMap(): Run: ForLoop: latlng: $latlng")
 
                     newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
                 }
@@ -438,6 +440,48 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
                 mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
             }
+        }
+    }
+
+    private fun findTheShortestRoute(routes: Array<out DirectionsRoute>?) {
+        log("findTheShortestRoute():init")
+
+        val route: DirectionsRoute? = null
+        var distanceList: ArrayList<Distance>? = ArrayList()
+        var count: Int = 0
+
+        for (i in routes!!) {
+            for (j in i.legs) {
+
+                distanceList!!.addAll(listOf(j.distance))
+
+                /*log("findTheShortestRoute(): Indexed Value of J: $j")
+                log("findTheShortestRoute(): Distance: ${j.distance}")
+                log("Test value: $count")*/
+            }
+        }
+
+        log("findTheShortestRoute(): $distanceList")//9.7
+
+        val temp: Distance = distanceList!![0]
+        for (small in distanceList) {
+            if (small.inMeters < temp.inMeters) {
+                val smallestDistance = small.inMeters
+
+                log("findTheShortestRoute(): smallestDistance: $smallestDistance,Count: $count")
+            }
+            log("findTheShortestRoute(): Small: $small")
+        }
+    }
+
+
+    private fun removeThePreviousPolylines() {
+        if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
+            for (polylineData: PolylineData in mPolylineDataList) {
+                polylineData.polyline.remove()
+            }
+            mPolylineDataList.clear()
+            mPolylineDataList = ArrayList()
         }
     }
 
@@ -452,7 +496,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
 
                 val polylineLatLng = LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng)
 
-                placeMarkerWithData(polylineLatLng, index + 1, polylineData.leg.duration)
+                placeMarkerWithData(polylineLatLng, index + 1, polylineData.leg.duration, polylineData.leg.distance)
             } else {
                 polylineData.polyline.color = getColor(R.color.colorPrimary)
                 polylineData.polyline.zIndex = 0F
@@ -501,7 +545,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
                     makeToast("Place:" + place.name + place.id)
 
-                    val address: String = place.name.toString() + place.address
+                    val address: String = place.address.toString()
                     mPickupAddress.text = address
 
 
@@ -512,6 +556,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                         removePolylinesPresent()
                     }
                     makeToast("onActivityResult(): Pickup: Location is" + place.latLng)
+                    placeTheDirections()
                 }
                 RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
@@ -538,8 +583,8 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
                         removePolylinesPresent()
                     }
 
-
                     log(" onActivityResult(): Destination: Location is" + place.latLng)
+                    placeTheDirections()
 
                 }
                 RESULT_ERROR -> {
@@ -580,7 +625,6 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
             log("cameraIdle(): Getting the data from the mCenter ")
             log("Center Details: " + mCenter.latitude + "," + mCenter.longitude)
             var address: String = getAddressFromLocation(mCenter.latitude, mCenter.longitude)
-
         }
     }
 
@@ -647,7 +691,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         updateTheCamera(latLng, 15F)
     }
 
-    private fun placeMarkerWithData(latLng: LatLng?, index: Int, duration: Duration) {
+    private fun placeMarkerWithData(latLng: LatLng?, index: Int, duration: Duration, distance: Distance) {
         var marker: Marker? = null
 
         when {
@@ -657,7 +701,7 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         marker = mMap.addMarker(
             MarkerOptions()
                 .title("Trip : $index")
-                .snippet("Duration: $duration")
+                .snippet("Duration: $duration, Distance: $distance ")
                 .position(latLng!!)
                 .draggable(true)
                 .visible(true)
@@ -686,9 +730,15 @@ class AddressActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPol
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 
+    private fun startTheActivity(mClass: Class<*>) {
+        val intent = Intent(mContext, mClass)
+        startActivity(intent)
+    }
+
     override fun onResume() {
         super.onResume()
         if (checkMapServices()) {
+            placeTheDirections()
             makeToast("GPS Enabled")
         }
     }

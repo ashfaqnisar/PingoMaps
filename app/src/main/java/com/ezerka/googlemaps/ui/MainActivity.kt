@@ -419,59 +419,53 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             removeThePreviousPolylines()
             log("Routes: ${result.routes[0].legs[0].distance}")
 
-            findTheShortestRoute(result.routes)
+            val route: DirectionsRoute = findTheShortestRoute(result.routes)
 
-            for (route: DirectionsRoute in result.routes) {
-                log("addPolyLinesToTheMap(): Run: ForLoop: Legs: ${route.legs[0]}")
-                val decodedPath: List<com.google.maps.model.LatLng> =
-                    PolylineEncoding.decode(route.overviewPolyline.encodedPath)
+            log("addPolyLinesToTheMap(): The route is $route")
 
-                val newDecodedPath: MutableList<LatLng> = ArrayList()
+            val decodedPath: List<com.google.maps.model.LatLng> =
+                PolylineEncoding.decode(route.overviewPolyline.encodedPath)
 
-                for (latlng: com.google.maps.model.LatLng in decodedPath) {
-                    log("addPolyLinesToTheMap(): Run: ForLoop: latlng: $latlng")
+            val newDecodedPath: MutableList<LatLng> = ArrayList()
 
-                    newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
-                }
+            for (latlng: com.google.maps.model.LatLng in decodedPath) {
+                log("addPolyLinesToTheMap(): Run: ForLoop: latlng: $latlng")
 
-                val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
-                polyline.color = getColor(R.color.colorPrimary)
-                polyline.isClickable = true
-
-                mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
+                newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
             }
+
+            val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
+            polyline.color = getColor(R.color.colorPrimary)
+            polyline.isClickable = true
+
+            mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
+
         }
     }
 
-    private fun findTheShortestRoute(routes: Array<out DirectionsRoute>?) {
+    private fun findTheShortestRoute(routes: Array<out DirectionsRoute>?): DirectionsRoute {
         log("findTheShortestRoute():init")
 
-        val route: DirectionsRoute? = null
-        var distanceList: ArrayList<Distance>? = ArrayList()
-        var count: Int = 0
+        val distanceList: ArrayList<Distance>? = ArrayList()
 
         for (i in routes!!) {
             for (j in i.legs) {
-
                 distanceList!!.addAll(listOf(j.distance))
-
-                /*log("findTheShortestRoute(): Indexed Value of J: $j")
-                log("findTheShortestRoute(): Distance: ${j.distance}")
-                log("Test value: $count")*/
             }
         }
 
-        log("findTheShortestRoute(): $distanceList")//9.7
+        log("findTheShortestRoute(): $distanceList")
 
-        val temp: Distance = distanceList!![0]
-        for (small in distanceList) {
-            if (small.inMeters < temp.inMeters) {
-                val smallestDistance = small.inMeters
+        var count = 0
+        val temp: Distance = distanceList!![0]//9.5
+        for ((i,small) in distanceList.withIndex()) {
 
-                log("findTheShortestRoute(): smallestDistance: $smallestDistance,Count: $count")
+            if (small.inMeters < temp.inMeters) {//
+                temp.inMeters = small.inMeters
+                count = i
             }
-            log("findTheShortestRoute(): Small: $small")
         }
+        return routes[count]
     }
 
 

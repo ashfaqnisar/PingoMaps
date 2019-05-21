@@ -63,8 +63,6 @@ import kotlin.collections.ArrayList
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
     NavigationView.OnNavigationItemSelectedListener {
 
-
-
     //Constant variables
     private val TAG: String = "MainActivity: "
     private val mPickupRequestCode: Int = 1
@@ -86,7 +84,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     private lateinit var mPlaceTheRide: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
     private lateinit var mPolylineDataList: ArrayList<PolylineData>
-    private var small: ArrayList<Distance> = ArrayList()
     private lateinit var mStateListAnimator: StateListAnimator
 
     //Map Variables
@@ -109,7 +106,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
         assignTheViews()
         assignTheLinks()
-        assignTheMethods()
     }
 
     private fun assignTheViews() {
@@ -193,6 +189,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+        val hyderabad = LatLng(17.3850, 78.4867)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
+
+        if (mGeoApiContext == null) {
+            mGeoApiContext = GeoApiContext.Builder()//Used for fetching the directions
+                .apiKey(mKey)
+                .build()
+        }
+
+        mMap.setOnPolylineClickListener(this)
+        mMap.uiSettings.isZoomControlsEnabled = false
+    }
+
     override fun onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START)
@@ -207,17 +221,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+        return when (item!!.itemId) {
             R.id.action_settings -> {
                 makeToast("Clicked Settings")
-                return true
+                true
             }
             R.id.action_list -> {
                 makeToast("Clicked List")
-                return true
+                true
             }
             else -> {
-                return super.onOptionsItemSelected(item)
+                super.onOptionsItemSelected(item)
             }
         }
     }
@@ -238,6 +252,119 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         return true
     }
 
+    private fun placeTheDirections() {
+        if (mPickupMarker != null && mDestinationMarker != null) {
+            makeToast("assignTheMethods(): Calculating Directions")
+            calculateDirections(mPickupMarker, mDestinationMarker)
+
+            val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
+            val mDestinationMarkerLatLng =
+                LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
+
+            adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
+        }
+    }
+
+    private fun calculateDirections(pickup_marker: Marker?, destination_marker: Marker?) {
+        log("calculateDirections():Calculating the directions")
+
+        val pickupLatLng =
+            com.google.maps.model.LatLng(pickup_marker!!.position.latitude, pickup_marker.position.longitude)
+        val destinationLatLng =
+            com.google.maps.model.LatLng(destination_marker!!.position.latitude, destination_marker.position.longitude)
+
+        val directions = DirectionsApiRequest(mGeoApiContext)
+
+        directions.alternatives(true)
+        directions.mode(TravelMode.DRIVING)
+
+        directions.origin(pickupLatLng)
+        directions.destination(destinationLatLng)
+            .setCallback(object : PendingResult.Callback<DirectionsResult> {
+
+                override fun onResult(result: DirectionsResult?) {
+                    log("calculateDirections(): Result is successful")
+
+                    log("calculateDirections(): Different Routes: ${result!!.routes[0]}")
+                    log("calculateDirections(): Duration : ${result.routes[0].legs[0].duration}")
+                    log("calculateDirections(): Distance: ${result.routes[0].legs[0].distance}")
+                    log("calculateDirections(): Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
+
+                    addPolyLinesToTheMap(result)
+                }
+
+                override fun onFailure(error: Throwable?) {
+                    logError("calculateDirections():Error: ${error!!.localizedMessage}")
+                }
+            })
+
+    }
+
+    private fun addPolyLinesToTheMap(result: DirectionsResult) {
+        Handler(Looper.getMainLooper()).post {
+            log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
+
+            removeThePreviousPolylines()
+            log("Routes: ${result.routes[0].legs[0].distance}")
+
+            val route: DirectionsRoute = findTheShortestRoute(result.routes)
+
+            log("addPolyLinesToTheMap(): The route is $route")
+
+            val decodedPath: List<com.google.maps.model.LatLng> =
+                PolylineEncoding.decode(route.overviewPolyline.encodedPath)
+
+            val newDecodedPath: MutableList<LatLng> = ArrayList()
+
+            for (latlng: com.google.maps.model.LatLng in decodedPath) {
+                log("addPolyLinesToTheMap(): Run: ForLoop: latlng: $latlng")
+
+                newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
+            }
+
+            val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
+            polyline.color = getColor(R.color.colorPrimary)
+            polyline.isClickable = true
+            mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
+
+        }
+    }
+
+    private fun findTheShortestRoute(routes: Array<out DirectionsRoute>?): DirectionsRoute {
+        log("findTheShortestRoute():init")
+
+        val distanceList: ArrayList<Distance>? = ArrayList()
+
+        for (i in routes!!) {
+            for (j in i.legs) {
+                distanceList!!.addAll(listOf(j.distance))
+            }
+        }
+
+        log("findTheShortestRoute(): $distanceList")
+
+        var count = 0
+        val temp: Distance = distanceList!![0]//9.5
+        for ((i, small) in distanceList.withIndex()) {
+
+            if (small.inMeters < temp.inMeters) {//
+                temp.inMeters = small.inMeters
+                count = i
+            }
+        }
+        return routes[count]
+    }
+
+    private fun removeThePreviousPolylines() {
+        if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
+            for (polylineData: PolylineData in mPolylineDataList) {
+                polylineData.polyline.remove()
+            }
+            mPolylineDataList.clear()
+            mPolylineDataList = ArrayList()
+        }
+    }
+
     private fun adjustTheCameraToBounds(mPickupLatLng: LatLng, mDestinationLatLng: LatLng) {
         val builder = LatLngBounds.builder()
 
@@ -256,53 +383,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         mMap.animateCamera(cameraUpdate)
     }
 
-    private fun assignTheMethods() {
-        checkMapServices()
 
-    }
-
-    private fun placeTheDirections() {
-        if (mPickupMarker != null && mDestinationMarker != null) {
-            makeToast("assignTheMethods(): Calculating Directions")
-            calculateDirections(mPickupMarker, mDestinationMarker)
-
-            val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
-            val mDestinationMarkerLatLng =
-                LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
-
-            adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
-        }
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-
-        val hyderabad = LatLng(17.3850, 78.4867)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hyderabad, 12.0f))
-
-        if (mGeoApiContext == null) {
-            mGeoApiContext = GeoApiContext.Builder()//Used for fetching the directions
-                .apiKey(mKey)
-                .build()
-        }
-
-        mMap.setOnPolylineClickListener(this)
-        mMap.uiSettings.isZoomControlsEnabled = false
-        /*try{
-            val success:Boolean = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_custom))
-
-            if(!success){
-                makeToast("Unable to customize the  map")
-            }
-        }
-        catch (error: Resources.NotFoundException){
-            logError("Error: $error")
-        }
-*/
-        //isCameraIdle()
-    }
 
 
     private fun checkMapServices(): Boolean {
@@ -373,110 +454,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.colorPrimary))
 
         }
-
         alertDialog.show()
-    }
-
-    private fun calculateDirections(pickup_marker: Marker?, destination_marker: Marker?) {
-        log("calculateDirections():Calculating the directions")
-
-        val pickupLatLng =
-            com.google.maps.model.LatLng(pickup_marker!!.position.latitude, pickup_marker.position.longitude)
-        val destinationLatLng =
-            com.google.maps.model.LatLng(destination_marker!!.position.latitude, destination_marker.position.longitude)
-
-        val directions = DirectionsApiRequest(mGeoApiContext)
-
-        directions.alternatives(true)
-        directions.mode(TravelMode.DRIVING)
-
-        directions.origin(pickupLatLng)
-        directions.destination(destinationLatLng)
-            .setCallback(object : PendingResult.Callback<DirectionsResult> {
-
-                override fun onResult(result: DirectionsResult?) {
-                    log("calculateDirections(): Result is successful")
-
-                    log("calculateDirections(): Different Routes: ${result!!.routes[0]}")
-                    log("calculateDirections(): Duration : ${result.routes[0].legs[0].duration}")
-                    log("calculateDirections(): Distance: ${result.routes[0].legs[0].distance}")
-                    log("calculateDirections(): Geocoded Waypoints: ${result.geocodedWaypoints[0]}")
-
-                    addPolyLinesToTheMap(result)
-                }
-
-                override fun onFailure(error: Throwable?) {
-                    logError("calculateDirections():Error: ${error!!.localizedMessage}")
-                }
-            })
-
-    }
-
-    private fun addPolyLinesToTheMap(result: DirectionsResult) {
-        Handler(Looper.getMainLooper()).post {
-            log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
-
-            removeThePreviousPolylines()
-            log("Routes: ${result.routes[0].legs[0].distance}")
-
-            val route: DirectionsRoute = findTheShortestRoute(result.routes)
-
-            log("addPolyLinesToTheMap(): The route is $route")
-
-            val decodedPath: List<com.google.maps.model.LatLng> =
-                PolylineEncoding.decode(route.overviewPolyline.encodedPath)
-
-            val newDecodedPath: MutableList<LatLng> = ArrayList()
-
-            for (latlng: com.google.maps.model.LatLng in decodedPath) {
-                log("addPolyLinesToTheMap(): Run: ForLoop: latlng: $latlng")
-
-                newDecodedPath.add(LatLng(latlng.lat, latlng.lng))
-            }
-
-            val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
-            polyline.color = getColor(R.color.colorPrimary)
-            polyline.isClickable = true
-
-            mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
-
-        }
-    }
-
-    private fun findTheShortestRoute(routes: Array<out DirectionsRoute>?): DirectionsRoute {
-        log("findTheShortestRoute():init")
-
-        val distanceList: ArrayList<Distance>? = ArrayList()
-
-        for (i in routes!!) {
-            for (j in i.legs) {
-                distanceList!!.addAll(listOf(j.distance))
-            }
-        }
-
-        log("findTheShortestRoute(): $distanceList")
-
-        var count = 0
-        val temp: Distance = distanceList!![0]//9.5
-        for ((i,small) in distanceList.withIndex()) {
-
-            if (small.inMeters < temp.inMeters) {//
-                temp.inMeters = small.inMeters
-                count = i
-            }
-        }
-        return routes[count]
-    }
-
-
-    private fun removeThePreviousPolylines() {
-        if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
-            for (polylineData: PolylineData in mPolylineDataList) {
-                polylineData.polyline.remove()
-            }
-            mPolylineDataList.clear()
-            mPolylineDataList = ArrayList()
-        }
     }
 
     override fun onPolylineClick(polyline: Polyline?) {
@@ -630,7 +608,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)
             log("getAddressFromLocation():The addresses are $addresses")
 
-            if (addresses.isNotEmpty()) {
+            return if (addresses.isNotEmpty()) {
                 val fetchedAddress: Address = addresses[0]
                 log("getAddressFromLocation():The fetched address is $fetchedAddress")
 
@@ -638,11 +616,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                 strAddress.append(fetchedAddress.getAddressLine(0)).append(" ")
                 log("getAddressFromLocation(): The address is $strAddress")
 
-                return strAddress.toString()
+                strAddress.toString()
 
             } else {
                 log("getAddressFromLocation(): searching the current address")
-                return getString(R.string.searching_address)
+                getString(R.string.searching_address)
             }
 
         } catch (error: IOException) {

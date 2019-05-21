@@ -40,6 +40,10 @@ dependencies {
     implementation 'org.slf4j:slf4j-nop:1.7.25'
 
 
+    implementation 'com.jakewharton:butterknife:8.8.1'//ButterKnife Dependency
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+
     implementation "com.karumi:dexter:4.2.0"//Dexter Runtime Permissions
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:cardview-v7:28.0.0'

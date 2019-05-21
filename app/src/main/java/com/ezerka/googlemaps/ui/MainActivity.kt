@@ -180,13 +180,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         mPlaceTheRide.setOnClickListener {
             if (mPickupMarker != null && mDestinationMarker != null) {
                 startTheActivity(BookingInputsActivity::class.java)
-
             } else {
+                logError("assignTheLinks():mPlaceTheRide: Didn't provide the pickup and destination")
                 makeToast("Please provide the pickup and destination address")
             }
 
         }
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -411,7 +410,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                 val dialog: Dialog = mGoogleApiAvailability.getErrorDialog(this, available, ERROR_REQUEST)
                 dialog.show()
             }
-            else -> makeToast("isServicesOK():You can't make services request")
+            else -> {
+                logError("isGoogleServicesInstalled():User can't make the request")
+                makeToast("isServicesOK():You can't make services request")
+            }
         }
         return false
     }
@@ -420,6 +422,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         val manager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            logError("isGpsEnabled():GPS is not active")
             buildAlertMessageNoGps()
             return false
         }
@@ -483,6 +486,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             makeToast("Please provide the permission to make the  application work")
         }
         if (!isGpsEnabled()) {
+            logError("getTheUserLocation():GPs is unabled")
             makeToast("Please enable the GPS to find your location")
         } else {
             mMap.isMyLocationEnabled = true
@@ -532,9 +536,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                 }
                 RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
-                    log("onActivityResult(): Pickup: Status: " + status.statusMessage)
+                    logError("onActivityResult(): Pickup: Status: " + status.statusMessage)
                 }
-                RESULT_CANCELED -> log("onActivityResult(): Pickup: User Cancelled the operation")
+                RESULT_CANCELED -> logError("onActivityResult(): Pickup: User Cancelled the operation")
             }
         }
 
@@ -561,12 +565,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                 }
                 RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
-                    log(" onActivityResult(): Destination: Status:" + status.statusMessage)
+                    logError(" onActivityResult(): Destination: Status:" + status.statusMessage)
                     makeToast("Error")
                 }
 
                 RESULT_CANCELED -> {
-                    log("onActivityResult(): Destination: User Cancelled the operation")
+                    logError("onActivityResult(): Destination: User Cancelled the operation")
                 }
             }
         }
@@ -582,7 +586,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     private fun removePolylinesPresent() {
         log("removePolyLinesPresent(): Removing the polylines present")
-        if (mPolylineDataList.size > 0) {//Checking whether the polyline was created before or not
+        if (mPolylineDataList.size > 0) {
             for (polylineData: PolylineData in mPolylineDataList) {
                 polylineData.polyline.remove()
             }

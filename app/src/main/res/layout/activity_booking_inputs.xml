@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.BookingInputsActivity"/>
+        android:background="#efefef"
+        tools:context="com.ezerka.googlemaps.ui.BookingInputsActivity">
+
+
+    <include layout="@layout/content_booking_inputs"/>
+
+    <!-- Adding bottom sheet after main content -->
+    <include layout="@layout/bottom_sheet"/>
+
+</android.support.design.widget.CoordinatorLayout>

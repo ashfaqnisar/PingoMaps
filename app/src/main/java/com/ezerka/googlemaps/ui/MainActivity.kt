@@ -178,12 +178,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         }
 
         mPlaceTheRide.setOnClickListener {
-            if (mPickupMarker != null && mDestinationMarker != null) {
+            startTheActivity(BookingInputsActivity::class.java)
+
+            /*if (mPickupMarker != null && mDestinationMarker != null) {
                 startTheActivity(BookingInputsActivity::class.java)
             } else {
                 logError("assignTheLinks():mPlaceTheRide: Didn't provide the pickup and destination")
                 makeToast("Please provide the pickup and destination address")
-            }
+            }*/
 
         }
     }

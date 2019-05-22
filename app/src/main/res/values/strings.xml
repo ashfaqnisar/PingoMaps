@@ -29,4 +29,7 @@
     <string name="open_the_drawer">Open The Drawer</string>
     <string name="close_the_drawer">Close The Drawer</string>
     <string name="list">List</string>
+
+    <string name="close_sheet">Close Sheet</string>
+    <string name="expand_sheet">Expand Sheet</string>
 </resources>

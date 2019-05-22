@@ -21,6 +21,8 @@
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginEnd="8dp"
+            android:background="#ffffff"
+            android:foreground="?attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent">
 
 
@@ -57,6 +59,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:background="#ffffff"
+            android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="5dp">
 
 
@@ -110,24 +114,22 @@
     <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:clickable="true"
-            app:srcCompat="@android:drawable/ic_menu_mylocation"
-            app:elevation="25dp"
+            app:srcCompat="@drawable/ic_icon_location"
+            app:elevation="18dp"
+            app:backgroundTint="@color/colorPrimary"
             android:id="@+id/id_Float_But_GetMyLocation"
             android:layout_marginBottom="60dp"
             app:layout_constraintBottom_toTopOf="@+id/id_But_PlaceThePickup"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:backgroundTint="@color/colorPrimary"
-            app:rippleColor="#00FFFFFF"
-            android:tint="#FDFDFD"
-            app:fabSize="normal"/>
+
+    />
     <Button
             android:text="@string/place_pickup"
             android:textColor="@color/quantum_white_100"
             android:layout_width="0dp"
-            android:background="@drawable/shape"
+            android:background="@drawable/ic_button_background"
             android:layout_height="58dp"
             android:stateListAnimator="@animator/lift_on_touch"
             android:id="@+id/id_But_PlaceThePickup"

@@ -41,6 +41,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"
             android:textColor="@color/quantum_white_100"
-            android:background="@drawable/shape"
+            android:background="@drawable/ic_button_background"
+            android:foreground="?attr/selectableItemBackground"
             android:padding="20dp"/>
 </android.support.constraint.ConstraintLayout>

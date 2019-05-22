@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps.models
+package com.ezerka.pingo.models
 
 import com.google.android.gms.maps.model.Polyline
 import com.google.maps.model.DirectionsLeg

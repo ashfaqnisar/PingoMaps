@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps.ui
+package com.ezerka.pingo.ui
 
 //Normal Imports
 
@@ -32,10 +32,10 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import com.ezerka.googlemaps.R
-import com.ezerka.googlemaps.models.PolylineData
-import com.ezerka.googlemaps.util.Constants.ERROR_REQUEST
-import com.ezerka.googlemaps.util.Constants.PERMISSIONS_ENABLE_GPS_REQUEST
+import com.ezerka.pingo.R
+import com.ezerka.pingo.models.PolylineData
+import com.ezerka.pingo.util.Constants.ERROR_REQUEST
+import com.ezerka.pingo.util.Constants.PERMISSIONS_ENABLE_GPS_REQUEST
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.Status
@@ -73,15 +73,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     //Normal Variables
     private lateinit var mKey: String
-    private lateinit var mPickupAddress: TextView
+    private lateinit var mPickupAddressText: TextView
     private lateinit var mPickupCardView: CardView
-    private lateinit var mDestinationAddress: TextView
+    private lateinit var mDestinationAddressText: TextView
     private lateinit var mDestinationCardView: CardView
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mNavigationView: NavigationView
     private lateinit var mToggle: ActionBarDrawerToggle
     private lateinit var mToolBar: Toolbar
-    private lateinit var mPlaceTheRide: Button
+    private lateinit var mPlaceTheRideButton: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
     private lateinit var mPolylineDataList: ArrayList<PolylineData>
     private lateinit var mStateListAnimator: StateListAnimator
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     private lateinit var mMapFragment: SupportMapFragment
     private lateinit var mMap: GoogleMap
-    private lateinit var mCenter: LatLng
+    private lateinit var mCenterLatLng: LatLng
     private lateinit var mPlacesClient: PlacesClient
     private lateinit var mFields: List<Place.Field>
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
@@ -124,19 +124,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
         mNavigationView.setNavigationItemSelectedListener(this)
 
-        mPickupAddress = findViewById(R.id.id_text_pickup_address)
-        mPickupAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
-        mPickupAddress.marqueeRepeatLimit = 1
-        mPickupAddress.isSelected = true
-        mPickupAddress.setSingleLine(true)
+        mPickupAddressText = findViewById(R.id.id_text_pickup_address)
+        mPickupAddressText.ellipsize = TextUtils.TruncateAt.MARQUEE
+        mPickupAddressText.marqueeRepeatLimit = 1
+        mPickupAddressText.isSelected = true
+        mPickupAddressText.setSingleLine(true)
 
-        mDestinationAddress = findViewById(R.id.id_text_destination_address)
-        mDestinationAddress.ellipsize = TextUtils.TruncateAt.MARQUEE
-        mDestinationAddress.marqueeRepeatLimit = 1
-        mDestinationAddress.isSelected = true
-        mDestinationAddress.setSingleLine(true)
+        mDestinationAddressText = findViewById(R.id.id_text_destination_address)
+        mDestinationAddressText.ellipsize = TextUtils.TruncateAt.MARQUEE
+        mDestinationAddressText.marqueeRepeatLimit = 1
+        mDestinationAddressText.isSelected = true
+        mDestinationAddressText.setSingleLine(true)
 
-        mPlaceTheRide = findViewById(R.id.id_But_PlaceThePickup)
+        mPlaceTheRideButton = findViewById(R.id.id_But_PlaceThePickup)
         mGetMyLocationButton = findViewById(R.id.id_Float_But_GetMyLocation)
 
         mKey = getString(R.string.google_maps_key)
@@ -177,13 +177,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             getTheUserLocation()
         }
 
-        mPlaceTheRide.setOnClickListener {
+        mPlaceTheRideButton.setOnClickListener {
             startTheActivity(BookingInputsActivity::class.java)
 
             /*if (mPickupMarker != null && mDestinationMarker != null) {
                 startTheActivity(BookingInputsActivity::class.java)
             } else {
-                logError("assignTheLinks():mPlaceTheRide: Didn't provide the pickup and destination")
+                logError("assignTheLinks():mPlaceTheRideButton: Didn't provide the pickup and destination")
                 makeToast("Please provide the pickup and destination address")
             }*/
 
@@ -242,11 +242,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             R.id.nav_home -> {
                 makeToast("Home Clicked")
             }
-            R.id.nav_gallery -> {
-                makeToast("Gallery Clicked")
+            R.id.nav_trips -> {
+                makeToast("Trips Clicked")
             }
-            R.id.nav_send -> {
-                makeToast("Send Clicked")
+            R.id.nav_notifications -> {
+                makeToast("Notifications Clicked")
             }
         }
         mDrawerLayout.closeDrawer(GravityCompat.START)
@@ -524,7 +524,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                     makeToast("Place:" + place.name + place.id)
 
                     val address: String = place.address.toString()
-                    mPickupAddress.text = address
+                    mPickupAddressText.text = address
 
 
                     updateTheCamera(place.latLng, 12F)
@@ -551,7 +551,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                     makeToast("Place:" + place.name + place.id)
 
                     val address: String = place.address.toString()
-                    mDestinationAddress.text = address
+                    mDestinationAddressText.text = address
 
 
                     updateTheCamera(place.latLng, 12F)
@@ -599,10 +599,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     private fun isCameraIdle() {
         mMap.setOnCameraIdleListener {
-            mCenter = mMap.cameraPosition.target
-            log("cameraIdle(): Getting the data from the mCenter ")
-            log("Center Details: " + mCenter.latitude + "," + mCenter.longitude)
-            var address: String = getAddressFromLocation(mCenter.latitude, mCenter.longitude)
+            mCenterLatLng = mMap.cameraPosition.target
+            log("cameraIdle(): Getting the data from the mCenterLatLng ")
+            log("Center Details: " + mCenterLatLng.latitude + "," + mCenterLatLng.longitude)
+            var address: String = getAddressFromLocation(mCenterLatLng.latitude, mCenterLatLng.longitude)
         }
     }
 

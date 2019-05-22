@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps.fragments
+package com.ezerka.pingo.fragments
 
 import android.content.Context
 import android.content.Intent
@@ -10,7 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.ezerka.googlemaps.R
+import com.ezerka.pingo.R
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 

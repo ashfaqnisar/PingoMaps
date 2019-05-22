@@ -133,6 +133,7 @@
             android:layout_height="58dp"
             android:stateListAnimator="@animator/lift_on_touch"
             android:id="@+id/id_But_PlaceThePickup"
+            android:foreground="?attr/selectableItemBackground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

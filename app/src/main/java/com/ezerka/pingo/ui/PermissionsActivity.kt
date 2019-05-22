@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps.ui
+package com.ezerka.pingo.ui
 
 import android.Manifest
 import android.content.Context
@@ -11,7 +11,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import com.ezerka.googlemaps.R
+import com.ezerka.pingo.R
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken

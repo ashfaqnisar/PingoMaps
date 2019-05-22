@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps.util
+package com.ezerka.pingo.util
 
 object Constants {
 

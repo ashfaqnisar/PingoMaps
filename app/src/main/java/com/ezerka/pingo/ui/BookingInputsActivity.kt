@@ -1,4 +1,4 @@
-package com.ezerka.googlemaps.ui
+package com.ezerka.pingo.ui
 
 import android.content.Context
 import android.content.Intent
@@ -11,8 +11,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
-import com.ezerka.googlemaps.R
-import com.ezerka.googlemaps.fragments.BottomSheetFragment
+import com.ezerka.pingo.R
+import com.ezerka.pingo.fragments.BottomSheetFragment
 
 class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmentInteractionListener {
 

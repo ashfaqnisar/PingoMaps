@@ -30,6 +30,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     testImplementation 'junit:junit:4.12'
@@ -43,10 +45,16 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:0.5' //Custom Markers Dependency
     implementation 'org.slf4j:slf4j-nop:1.7.25'
 
-
     implementation "com.karumi:dexter:4.2.0"//Dexter Runtime Permissions
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:cardview-v7:28.0.0'
 
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'//Google Authentication Dependency
+
+    implementation 'com.google.firebase:firebase-database:17.0.0'//Firebase Realtime Database
+    implementation 'com.google.firebase:firebase-core:16.0.9' //Firebase Integration Dependency
+    implementation 'com.google.firebase:firebase-auth:17.0.0' //Firebase Authentication Dependency
+    implementation 'com.google.firebase:firebase-firestore:19.0.0' //Firebase FireStore Dependency
+    implementation 'com.google.firebase:firebase-messaging:18.0.0' //Firebase Messaging Dependency
+    implementation 'com.google.firebase:firebase-storage:17.0.0' //Firebase Storage Dependency
 
 }
+apply plugin: 'com.google.gms.google-services'

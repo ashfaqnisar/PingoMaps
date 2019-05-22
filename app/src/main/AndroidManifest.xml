@@ -2,11 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="com.ezerka.pingo">
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -17,8 +13,10 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.RegisterActivity">
+        </activity>
         <activity
-                android:name="com.ezerka.pingo.ui.LoginActivity"
+                android:name=".ui.LoginActivity"
                 android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -26,16 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.ezerka.pingo.ui.TripsActivity">
+        <activity android:name=".ui.TripsActivity">
         </activity>
-        <activity android:name="com.ezerka.pingo.ui.BookingInputsActivity">
+        <activity android:name=".ui.BookingInputsActivity">
         </activity>
         <activity
-                android:name="com.ezerka.pingo.ui.MainActivity"
+                android:name=".ui.MainActivity"
                 android:label="@string/title_activity_navigation"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name="com.ezerka.pingo.ui.PermissionsActivity">
+        <activity android:name=".ui.PermissionsActivity">
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

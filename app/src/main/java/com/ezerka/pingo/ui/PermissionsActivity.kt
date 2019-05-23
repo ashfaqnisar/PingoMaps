@@ -113,8 +113,11 @@ class PermissionsActivity : AppCompatActivity() {
 
 
     private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): Starting the ${mClass.simpleName}.class Activity")
         val intent = Intent(mContext, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
         finish()
     }
 
@@ -129,7 +132,7 @@ class PermissionsActivity : AppCompatActivity() {
     }
 
     private fun makeToast(toast: String) {
-        log("Making a toast of $toast")
+        log("Toast: $toast")
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 }

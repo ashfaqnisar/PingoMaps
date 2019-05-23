@@ -121,7 +121,6 @@ class LoginActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == mGoogleAuthRequestCode) {
-            showLoadingBar("mGoogleAuthRequestCode")
             val task: Task<GoogleSignInAccount>? = GoogleSignIn.getSignedInAccountFromIntent(data)
 
             log("onActivityResult(): mGoogleAuthRequestCode: Init")
@@ -142,17 +141,16 @@ class LoginActivity : AppCompatActivity() {
 
         val mCredential = GoogleAuthProvider.getCredential(mAccount.idToken, null)
 
-        mAuth!!.signInWithCredential(mCredential).addOnCompleteListener {
-            if (it.isSuccessful) {
+        mAuth!!.signInWithCredential(mCredential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
                 closeLoadingBar("firebaseAuthWithGoogle()")
                 log("firebaseAuthWithGoogle():signWithCredential(): User is successfully stored")
-                log("firebaseAuthWithGoogle():signWithCredential(): User Id: ${mUser!!.uid}")
                 makeToast("User is successfully signed in!! ")
                 startTheActivity(PermissionsActivity::class.java)
             } else {
                 closeLoadingBar("firebaseAuthWithGoogle()")
                 makeToast("Unable to sign in the user, Please try again")
-                logError("firebaseAuthWithGoogle(): Error: " + it.exception)
+                logError("firebaseAuthWithGoogle(): Error: " + task.exception)
             }
         }
     }
@@ -201,52 +199,40 @@ class LoginActivity : AppCompatActivity() {
         if (mUser != null) {
             log("checkForAlreadySignedInUser():User is logged in with Id: ${mUser!!.uid}, ${mUser!!.displayName}")
             makeToast("User Has Been Already Logged In")
-            startTheActivity(MainActivity::class.java)
-
-        }
-
-        val mAccount = GoogleSignIn.getLastSignedInAccount(this)
-
-        if (mAccount != null) {
-            log("User already logged in with the google account")
-            makeToast("user already logged in the system.")
             startTheActivity(PermissionsActivity::class.java)
-        } else {
-            logError("User not logged in before starting the sign up process")
-            showLoadingBar("checkForAlreadySignedInUser():else")
-            firebaseGoogleLogIn()
         }
+
     }
 
     private fun log(log: String) {
-        Log.d(TAG, log)
+        Log.v(TAG, "Log: $log")
     }
 
     private fun logError(error: String) {
-        Log.w(TAG, error)
+        Log.e(TAG, "Log Error: $error")
     }
 
     private fun startTheActivity(mClass: Class<*>) {
-        log("Starting the $mClass.class Activity")
+        log("startTheActivity(): Starting the ${mClass.simpleName}.class Activity")
         val intent = Intent(mContext, mClass)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-        log("Opened the $mClass.class Activity")
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
         finish()
     }
 
     private fun showLoadingBar(method: String) {
-        log("Loading Bar has been started by $method")
+        log("showLoadingBar(): $method")
         mLoginProgressBar.visibility = View.VISIBLE
     }
 
     private fun closeLoadingBar(method: String) {
-        log("Loading Bar has been closed by $method")
+        log("closeLoadingBar(): $method")
         mLoginProgressBar.visibility = View.GONE
     }
 
     private fun makeToast(toast: String) {
-        log("Making a toast of $toast")
+        log("Toast: $toast")
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 

@@ -18,21 +18,20 @@ class RegisterActivity : AppCompatActivity() {
 
     //Constant Variables
     private val TAG: String = "RegisterActivity: "
-    private var mContext: Context? = null
+    private lateinit var mContext: Context
 
     //Normal Variables
-    private var mEmailRegisterET: EditText? = null
-    private var mPassRegisterET: EditText? = null
-    private var mMobileRegisterET: EditText? = null
-    private var mRegisterButton: Button? = null
-    private var mBackToLoginText: TextView? = null
-    private var mRegisterProgressBar: ProgressBar? = null
+    private lateinit var mEmailRegisterET: EditText
+    private lateinit var mPassRegisterET: EditText
+    private lateinit var mMobileRegisterET: EditText
+    private lateinit var mRegisterButton: Button
+    private lateinit var mBackToLoginText: TextView
+    private lateinit var mRegisterProgressBar: ProgressBar
 
     //Firebase Variables
     private var mAuth: FirebaseAuth? = null
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
-
     private var mDatabase: FirebaseFirestore? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,26 +59,17 @@ class RegisterActivity : AppCompatActivity() {
 
         mUser = mAuth!!.currentUser
 
-        mAuthListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            mUser = firebaseAuth.currentUser
-            if (mUser != null) {
-                log("ModelUser is signed in with " + mUser!!.uid)
-            } else {
-                log("ModelUser is signed out")
-            }
-        }
-
         mDatabase = FirebaseFirestore.getInstance()
     }
 
     private fun assignTheLinks() {
-        mRegisterButton!!.setOnClickListener {
-            log("Registering the user")
+        mRegisterButton.setOnClickListener {
+            log("assignTheLinks(): mRegisterButton: Registering the user")
             registerTheUser()
         }
 
-        mBackToLoginText!!.setOnClickListener {
-            log("Starting The Login Activity")
+        mBackToLoginText.setOnClickListener {
+            log("assignTheLinks():mBackToLoginText: Starting the LoginActivity")
             startTheActivity(LoginActivity::class.java)
         }
     }
@@ -88,27 +78,26 @@ class RegisterActivity : AppCompatActivity() {
     private fun registerTheUser() {
         showLoadingBar("RegisterTheUser")
 
-        val sEmail: String = mEmailRegisterET!!.text.toString().trim()
-        val sPass: String = mPassRegisterET!!.text.toString().trim()
-        val sMobile: String = mMobileRegisterET!!.text.toString().trim()
+        val sEmail: String = mEmailRegisterET.text.toString().trim()
+        val sPass: String = mPassRegisterET.text.toString().trim()
+        val sMobile: String = mMobileRegisterET.text.toString().trim()
 
 
         if (checkForErrors(sEmail, sPass, sMobile)) {
 
-            mAuth!!.createUserWithEmailAndPassword(sEmail, sPass).addOnCompleteListener { Task ->
-                if (Task.isSuccessful) {
-
-                    closeLoadingBar("registerTheUser: Successfull listener")
-                    log("Successfully Registered the user: " + mAuth!!.uid)
+            mAuth!!.createUserWithEmailAndPassword(sEmail, sPass).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    closeLoadingBar("registerTheUser()")
+                    log("registerTheUser: Task Successful: User Registered: ${mAuth!!.uid}")
 
                     mAuth!!.signOut()
-
+                    log("registerTheUser: Signing out the user.")
                     startTheActivity(LoginActivity::class.java)
                     makeToast("Registered  Successfully ")
                 } else {
                     closeLoadingBar("registerTheUser: Failure Listener")
-                    makeToast("Unable to Register the user, Please Try Again, " + Task.exception.toString())
-                    logError("Error: " + Task.exception.toString())
+                    logError("registerTheUser(): Task Unsuccessful: ${task.exception}")
+                    makeToast("Unable to Register the user, Please Try Again.")
                 }
             }
 
@@ -117,86 +106,87 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun storeTheDataOnDB() {
-        val user_id: String = mAuth!!.currentUser!!.uid
+        val userId: String = mAuth!!.currentUser!!.uid
 
-        val user_details = HashMap<String, Any>()
-        user_details["Email Id"] = "Ashfaq"
-        user_details["Password"] = "Helloworld"
-        user_details["Mobile"] = "8328277518"
+        val userDetails = HashMap<String, Any>()
+        userDetails["Email Id"] = "Ashfaq"
+        userDetails["Password"] = "Hello world"
+        userDetails["Mobile"] = "8328277518"
 
         mDatabase!!.collection("Users")
             .document("drivers")
-            .collection(user_id)
-            .add(user_details)
-            .addOnCompleteListener { Task ->
-                if (Task.isSuccessful) {
-                    log("Data has been successfully stored ")
+            .collection(userId)
+            .add(userDetails)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    log("storeTheDataOnDB():Task Success(): Data has been successfully stored ")
                     makeToast("Data Stored Successfully")
                 } else {
-                    logError("Unable to store the data " + Task.exception)
-                    makeToast("Error: " + Task.exception.toString())
+                    logError("storeTheDataOnDB():Task Failed: Unable to store the data " + task.exception)
+                    makeToast("Error: " + task.exception.toString())
                 }
             }
     }
 
     private fun checkForErrors(Email: String, Pass: String, Mobile: String): Boolean {
         if (Email.isEmpty()) {
-            mEmailRegisterET!!.error = "Please Enter The Email Id"
+            mEmailRegisterET.error = "Please Enter The Email Id"
             return false
         }
 
         if (Pass.isEmpty()) {
-            mPassRegisterET!!.error = "Please, Enter The Password"
+            mPassRegisterET.error = "Please, Enter The Password"
             return false
         }
 
         if (Mobile.isEmpty()) {
-            mMobileRegisterET!!.error = "Please, Enter the Mobile"
+            mMobileRegisterET.error = "Please, Enter the Mobile"
             return false
         }
         return true
     }
 
     private fun log(log: String) {
-        Log.d(TAG, log)
+        Log.v(TAG, "Log: $log")
     }
 
     private fun logError(error: String) {
-        Log.w(TAG, error)
+        Log.e(TAG, "Log Error: $error")
     }
 
     private fun startTheActivity(mClass: Class<*>) {
-        log("Starting the $mClass.class Activity")
+        log("startTheActivity(): Starting the ${mClass.simpleName}.class Activity")
         val intent = Intent(mContext, mClass)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-        log("Opened the $mClass.class Activity")
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
         finish()
     }
 
     private fun showLoadingBar(method: String) {
-        log("Loading Bar has been started by $method")
-        mRegisterProgressBar!!.visibility = View.VISIBLE
+        log("showLoadingBar(): $method")
+        mRegisterProgressBar.visibility = View.VISIBLE
     }
 
     private fun closeLoadingBar(method: String) {
-        log("Loading Bar has been closed by $method")
-        mRegisterProgressBar!!.visibility = View.GONE
+        log("closeLoadingBar(): $method")
+        mRegisterProgressBar.visibility = View.GONE
     }
 
+
     private fun makeToast(toast: String) {
-        log("Making a toast of $toast")
+        log("Toast: $toast")
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 
     override fun onStart() {
         super.onStart()
-        mAuth!!.addAuthStateListener { mAuthListener }
+        log("onStart(): Init")
     }
 
     override fun onStop() {
         super.onStop()
-        mAuth!!.removeAuthStateListener { mAuthListener }
+        log("onStop(): Init")
     }
 
 }

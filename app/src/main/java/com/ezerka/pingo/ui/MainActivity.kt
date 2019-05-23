@@ -50,6 +50,8 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity.RESULT_ERROR
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.maps.DirectionsApiRequest
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
@@ -98,6 +100,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     private lateinit var mFields: List<Place.Field>
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var mLastLocation: Location
+
+    //Firebase Variables
+    private var mAuth: FirebaseAuth? = null
+    private var mAuthListener: FirebaseAuth.AuthStateListener? = null
+    private var mUser: FirebaseUser? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,6 +165,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         mGoogleApiAvailability = GoogleApiAvailability.getInstance()
 
         mPolylineDataList = ArrayList()
+
+        mAuth = FirebaseAuth.getInstance()
+
+        mUser = mAuth!!.currentUser
+
+        mAuthListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            mUser = firebaseAuth.currentUser
+            if (mUser != null) {
+                log("User is signed in with id:  " + mUser!!.uid)
+            } else {
+                log("User is signed out")
+            }
+        }
 
     }
 
@@ -245,12 +265,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             R.id.nav_trips -> {
                 makeToast("Trips Clicked")
             }
-            R.id.nav_notifications -> {
-                makeToast("Notifications Clicked")
+            R.id.nav_logout -> {
+                log("onNavigationItemSelected():Logout Clicked: Logging out the user")
+                logoutTheUser()
+
             }
         }
         mDrawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun logoutTheUser() {
+        log("logoutTheUser():User Logged out Successfully")
+        mAuth!!.signOut()
+        log("logoutTheUser():Starting the LoginActivity")
+        startTheActivity(LoginActivity::class.java)
     }
 
     private fun placeTheDirections() {
@@ -704,20 +733,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     }
 
     private fun makeToast(toast: String) {
-        log("Making a toast of $toast")
+        log("Toast: $toast")
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 
     private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
         val intent = Intent(mContext, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
     }
 
     override fun onResume() {
         super.onResume()
         if (checkMapServices()) {
             placeTheDirections()
-            makeToast("GPS Enabled")
+            log("onResume(): GPS Enabled")
         }
     }
 

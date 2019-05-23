@@ -26,7 +26,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -57,6 +56,7 @@ import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.internal.PolylineEncoding
 import com.google.maps.model.*
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     NavigationView.OnNavigationItemSelectedListener {
 
     //Constant variables
-    private val TAG: String = "MainActivity: "
     private val mPickupRequestCode: Int = 1
     private val mDestinationRequestCode: Int = 2
     private lateinit var mContext: Context
@@ -724,12 +723,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     }
 
     private fun log(log: String) {
-        Log.v(TAG, "Log: $log")
-
+        Timber.d("Log: $log")
     }
 
     private fun logError(error: String) {
-        Log.e(TAG, "Log: $error")
+        Timber.e("Log Error: $error")
     }
 
     private fun makeToast(toast: String) {

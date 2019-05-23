@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -17,6 +16,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import timber.log.Timber
 
 class PermissionsActivity : AppCompatActivity() {
 
@@ -123,12 +123,11 @@ class PermissionsActivity : AppCompatActivity() {
 
 
     private fun log(log: String) {
-        Log.v(TAG, "Log: $log")
-
+        Timber.d("Log: $log")
     }
 
     private fun logError(error: String) {
-        Log.e(TAG, "Log: $error")
+        Timber.e("Log Error: $error")
     }
 
     private fun makeToast(toast: String) {

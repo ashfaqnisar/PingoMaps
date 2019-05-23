@@ -6,18 +6,17 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.BottomSheetFragment
+import timber.log.Timber
 
 class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmentInteractionListener {
 
 
-    private val TAG: String = "BookingInputsActivity: "
     private lateinit var mContext: Context
 
     private lateinit var mButtonBottomSheet: Button
@@ -100,21 +99,24 @@ class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmen
     }
 
     private fun log(log: String) {
-        Log.v(TAG, "Log: $log")
+        Timber.d("Log: $log")
 
     }
 
     private fun logError(error: String) {
-        Log.e(TAG, "Log: $error")
+        Timber.e("Log Error: $error")
     }
 
     private fun makeToast(toast: String) {
-        log("Making a toast of $toast")
+        log("Toast: $toast")
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 
     private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
         val intent = Intent(mContext, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
     }
 }

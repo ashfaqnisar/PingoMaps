@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.*
 import com.ezerka.pingo.R
@@ -18,12 +17,12 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import timber.log.Timber
 
 
 class LoginActivity : AppCompatActivity() {
 
     //Constant Variables
-    private val TAG: String = "LoginActivity: "
     private lateinit var mContext: Context
 
     //Normal Variables
@@ -205,11 +204,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun log(log: String) {
-        Log.v(TAG, "Log: $log")
+        Timber.d("Log: $log")
     }
 
     private fun logError(error: String) {
-        Log.e(TAG, "Log Error: $error")
+        Timber.e("Log Error: $error")
     }
 
     private fun startTheActivity(mClass: Class<*>) {

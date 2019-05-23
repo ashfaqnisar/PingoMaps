@@ -47,6 +47,8 @@ dependencies {
 
     implementation "com.karumi:dexter:4.2.0"//Dexter Runtime Permissions
 
+    implementation 'com.jakewharton.timber:timber:4.7.1'//Timber Logging Library
+
     implementation 'com.google.android.gms:play-services-auth:16.0.1'//Google Authentication Dependency
 
     implementation 'com.google.firebase:firebase-database:17.0.0'//Firebase Realtime Database

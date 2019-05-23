@@ -67,11 +67,6 @@ import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.internal.PolylineEncoding
 import com.google.maps.model.*
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
@@ -85,7 +80,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     private val mPickupRequestCode: Int = 1
     private val mDestinationRequestCode: Int = 2
     private lateinit var mContext: Context
-    private var mLocationPermissionGranted: Boolean = false
+    private var mLocationPermissionGranted: Boolean = true
     private lateinit var mGoogleApiAvailability: GoogleApiAvailability
 
     //Normal Variables
@@ -217,13 +212,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
         mGetMyLocationButton.setOnClickListener {
             log("assignTheLinks(): mGetMyLocationButton")
-            if (mLocationPermissionGranted) {
-                getTheUserLocation()
-            } else {
-                requestTheMapPermission()
-            }
-
-
+            getTheUserLocation()
         }
 
         mPlaceTheRideButton.setOnClickListener {
@@ -240,7 +229,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     }
 
     private fun assignTheMethods() {
-        requestTheMapPermission()
         setupTheNavigationHeader()
 
         setupTheNavigationView()
@@ -351,52 +339,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     private fun setupTheNavigationView() {
 
-    }
-
-    private fun requestTheMapPermission(): Boolean {
-        log("requestTheMapPermission():Requesting the Map Permissions")
-        Dexter.withActivity(this)
-
-            .withPermissions(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_NETWORK_STATE
-            )
-
-            .withListener(object : MultiplePermissionsListener {
-
-                override fun onPermissionsChecked(reportResult: MultiplePermissionsReport) {
-                    log("Checking Whether all the permissions are granted")
-
-                    if (reportResult.areAllPermissionsGranted()) {
-                        log("requestTheMapPermission(): onPermissionsChecked: Granted: All permissions are granted")
-                        makeToast("All Permissions Are Granted")
-                        mLocationPermissionGranted = true
-                    }
-
-                    if (reportResult.isAnyPermissionPermanentlyDenied) {
-                        logError("requestTheMapPermission(): onPermissionsChecked: Error: ${reportResult.deniedPermissionResponses}")
-                        makeToast("Unable to provide all the permissions")
-                        mLocationPermissionGranted = false
-                    }
-
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>,
-                    token: PermissionToken
-                ) {
-
-                    token.continuePermissionRequest()
-                }
-            })
-
-            .withErrorListener { error ->
-                logError("requestTheMapPermission(): ErrorListener: Error: $error")
-            }
-
-            .onSameThread()
-            .check()
-        return mLocationPermissionGranted
     }
 
     private fun logoutTheUser() {
@@ -871,24 +813,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     override fun onResume() {
         super.onResume()
         if (checkMapServices()) {
-            if (mLocationPermissionGranted) {
-                placeTheDirections()
-                log("onResume(): GPS Enabled")
-            } else {
-                requestTheMapPermission()
-            }
+            placeTheDirections()
+            log("onResume(): GPS Enabled")
         }
     }
 
     override fun onStart() {
         super.onStart()
         log("onStart():Starting the Activity")
-        if (mLocationPermissionGranted) {
-            log("onStart(): Permissions are granted")
-        } else {
-            requestTheMapPermission()
-        }
-
-
     }
 }

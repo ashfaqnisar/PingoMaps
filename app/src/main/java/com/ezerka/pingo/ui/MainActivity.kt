@@ -368,13 +368,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
                     log("Checking Whether all the permissions are granted")
 
                     if (reportResult.areAllPermissionsGranted()) {
-                        log("All permissions are granted")
+                        log("requestTheMapPermission(): onPermissionsChecked: Granted: All permissions are granted")
                         makeToast("All Permissions Are Granted")
                         mLocationPermissionGranted = true
                     }
 
                     if (reportResult.isAnyPermissionPermanentlyDenied) {
-                        logError("(reportResult)+Unable to grant all the permission")
+                        logError("requestTheMapPermission(): onPermissionsChecked: Error: ${reportResult.deniedPermissionResponses}")
                         makeToast("Unable to provide all the permissions")
                         mLocationPermissionGranted = false
                     }
@@ -391,7 +391,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
             })
 
             .withErrorListener { error ->
-                logError("ErrorListener:A error has been occured: $error")
+                logError("requestTheMapPermission(): ErrorListener: Error: $error")
             }
 
             .onSameThread()

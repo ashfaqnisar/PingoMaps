@@ -101,7 +101,7 @@ class LoginActivity : AppCompatActivity() {
 
         mSkipLoginText.setOnClickListener {
             log("mSkipLoginText: OnClick: Starting The Permissions Activity")
-            startTheActivity(PermissionsActivity::class.java)
+            startTheActivity(MainActivity::class.java)
         }
         mGoogleSignInButton.setOnClickListener {
             log("mGoogleSignInButton: OnClick: Logging in the user")
@@ -145,7 +145,7 @@ class LoginActivity : AppCompatActivity() {
                 closeLoadingBar("firebaseAuthWithGoogle()")
                 log("firebaseAuthWithGoogle():signWithCredential(): User is successfully stored")
                 makeToast("User is successfully signed in!! ")
-                startTheActivity(PermissionsActivity::class.java)
+                startTheActivity(MainActivity::class.java)
             } else {
                 closeLoadingBar("firebaseAuthWithGoogle()")
                 makeToast("Unable to sign in the user, Please try again")
@@ -167,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
                     log("Successfully Logged In with user: " + mAuth!!.uid)
                     makeToast("Signed In  Successfully ")
 
-                    startTheActivity(PermissionsActivity::class.java)
+                    startTheActivity(MainActivity::class.java)
                 } else {
                     closeLoadingBar("loginTheUser: signInWithEmailAndPassword(): Failure Listener")
                     makeToast("Unable to Sign in, Please Try Again " + Task.exception.toString())
@@ -198,7 +198,7 @@ class LoginActivity : AppCompatActivity() {
         if (mUser != null) {
             log("checkForAlreadySignedInUser():User is logged in with Id: ${mUser!!.uid}, ${mUser!!.displayName}")
             makeToast("User Has Been Already Logged In")
-            startTheActivity(PermissionsActivity::class.java)
+            startTheActivity(MainActivity::class.java)
         }
 
     }

@@ -57,5 +57,4 @@ class NavigationNotificationsFragment : Fragment() {
         fun onFragmentInteraction(uri: Uri)
     }
 
-
 }

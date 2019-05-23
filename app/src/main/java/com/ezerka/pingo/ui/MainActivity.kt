@@ -9,6 +9,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -28,9 +29,19 @@ import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.ezerka.pingo.R
 import com.ezerka.pingo.models.PolylineData
 import com.ezerka.pingo.util.Constants.ERROR_REQUEST
@@ -74,12 +85,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
     //Normal Variables
     private lateinit var mKey: String
+    private lateinit var mThumbnailImageView: ImageView
     private lateinit var mPickupAddressText: TextView
     private lateinit var mPickupCardView: CardView
     private lateinit var mDestinationAddressText: TextView
     private lateinit var mDestinationCardView: CardView
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mNavigationView: NavigationView
+    private lateinit var mNavigationHeader: View
     private lateinit var mToggle: ActionBarDrawerToggle
     private lateinit var mToolBar: Toolbar
     private lateinit var mPlaceTheRideButton: Button
@@ -112,6 +125,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
         assignTheViews()
         assignTheLinks()
+        assignTheMethods()
     }
 
     private fun assignTheViews() {
@@ -122,13 +136,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
 
         mDrawerLayout = findViewById(R.id.id_Layout_DrawerLayout)
         mNavigationView = findViewById(R.id.id_View_NavigationView)
+
         mToggle =
             ActionBarDrawerToggle(this, mDrawerLayout, mToolBar, R.string.open_the_drawer, R.string.close_the_drawer)
-
         mDrawerLayout.addDrawerListener(mToggle)
         mToggle.syncState()
 
+
         mNavigationView.setNavigationItemSelectedListener(this)
+
+        mNavigationHeader = mNavigationView.getHeaderView(0)
+
+        mThumbnailImageView = mNavigationHeader.findViewById(R.id.id_Image_Thumbnail)
 
         mPickupAddressText = findViewById(R.id.id_text_pickup_address)
         mPickupAddressText.ellipsize = TextUtils.TruncateAt.MARQUEE
@@ -209,6 +228,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         }
     }
 
+    private fun assignTheMethods() {
+        setupTheNavigationHeader()
+
+        setupTheNavigationView()
+
+    }
+
+
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -230,6 +258,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
     override fun onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START)
+            log("onBackPressed():Closed the drawer")
         } else {
             super.onBackPressed()
         }
@@ -272,6 +301,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnPolyli
         }
         mDrawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun setupTheNavigationHeader() {
+        Glide.with(this)
+            .load("https://avatars1.githubusercontent.com/u/20638539?s=460&v=4")
+            .listener(object : RequestListener<Drawable> {
+
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    logError("setupTheNavigationHeader(): onLoadFailed: Unable to fetch the image")
+                    logError("setupTheNavigationHeader():Error: $e")
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    log("setupTheNavigationHeader():OnResourceReady: Image Fetched Succesfully")
+                    return false
+                }
+
+            })
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .apply(RequestOptions.bitmapTransform(CircleCrop()).error(R.drawable.ic_detective))
+            .thumbnail(0.5f)
+            .into(mThumbnailImageView)
+    }
+
+    private fun setupTheNavigationView() {
+
     }
 
     private fun logoutTheUser() {

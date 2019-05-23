@@ -11,6 +11,6 @@
     <include layout="@layout/content_booking_inputs"/>
 
     <!-- Adding bottom sheet after main content -->
-    <include layout="@layout/bottom_sheet"/>
+    <include layout="@layout/comp_bottom_sheet"/>
 
 </android.support.design.widget.CoordinatorLayout>

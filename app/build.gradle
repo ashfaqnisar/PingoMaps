@@ -4,6 +4,9 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -49,6 +52,11 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.7.1'//Timber Logging Library
 
+    implementation 'com.github.bumptech.glide:glide:4.8.0' //Glide Image Library
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'//Kotlin Glide Compiler
+
+
+
     implementation 'com.google.android.gms:play-services-auth:16.0.1'//Google Authentication Dependency
 
     implementation 'com.google.firebase:firebase-database:17.0.0'//Firebase Realtime Database
@@ -60,3 +68,4 @@ dependencies {
 
 }
 apply plugin: 'com.google.gms.google-services'
+

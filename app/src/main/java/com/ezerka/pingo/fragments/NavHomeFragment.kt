@@ -66,7 +66,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class NavigationHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
+class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
 
 
     private val mPickupRequestCode: Int = 1
@@ -117,7 +117,7 @@ class NavigationHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolyl
         savedInstanceState: Bundle?
     ): View? {
         log("onCreateView: init")
-        val view = inflater.inflate(R.layout.fragment_navigation_home, container, false)
+        val view = inflater.inflate(R.layout.fragment_nav_home, container, false)
         assignTheViews(view)
         assignTheLinks()
         assignTheMethods()

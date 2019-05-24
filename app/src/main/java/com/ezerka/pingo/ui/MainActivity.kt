@@ -35,7 +35,7 @@ import com.google.firebase.auth.FirebaseUser
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity(),
-    NavigationView.OnNavigationItemSelectedListener, NavigationHomeFragment.OnFragmentInteractionListener {
+    NavigationView.OnNavigationItemSelectedListener, NavHomeFragment.OnFragmentInteractionListener {
 
     private var mNavViewItemIndex: Int = 0
     private lateinit var mNavTitleArray: Array<String>
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(),
     private fun assignTheViews() {
         mContext = applicationContext
 
-        mToolBar = findViewById(R.id.id_toolbar)
+        mToolBar = findViewById(R.id.id_Toolbar_MainActivity)
         setSupportActionBar(mToolBar)
 
         mDrawerLayout = findViewById(R.id.id_Layout_DrawerLayout)
@@ -182,8 +182,9 @@ class MainActivity : AppCompatActivity(),
 
             R.id.nav_trips -> {
                 log("onNavigationItemSelected():Trips Clicked:")
-                mNavViewItemIndex = 1
-                mNavActivityTag = TAG_TRIPS
+                startTheActivity(TripsActivity::class.java)
+                /* mNavViewItemIndex = 1
+                 mNavActivityTag = TAG_TRIPS*/
 
                 makeToast("Trips Clicked")
             }
@@ -258,6 +259,7 @@ class MainActivity : AppCompatActivity(),
 
         mDrawerLayout.closeDrawers()
 
+        invalidateOptionsMenu()
 
     }
 
@@ -265,31 +267,31 @@ class MainActivity : AppCompatActivity(),
         log("getActiveFragment():init")
         when (mNavViewItemIndex) {
             0 -> {
-                return NavigationHomeFragment()
+                return NavHomeFragment()
             }
 
             1 -> {
-                return NavigationTripsActivity()
+                return NavTripsFragment()
             }
 
             2 -> {
-                return NavigationPaymentActivity()
+                return NavPaymentFragment()
             }
 
             3 -> {
-                return NavigationNotificationsFragment()
+                return NavNotificationsFragment()
             }
 
             4 -> {
-                return NavigationSettingsFragment()
+                return NavSettingsFragment()
             }
 
             5 -> {
-                return NavigationSupportFragment()
+                return NavSupportFragment()
             }
 
             else -> {
-                return NavigationHomeFragment()
+                return NavHomeFragment()
             }
         }
     }
@@ -355,7 +357,7 @@ class MainActivity : AppCompatActivity(),
     private fun startTheActivity(mClass: Class<*>) {
         log("startTheActivity(): ${mClass.simpleName}.class Activity")
         val intent = Intent(mContext, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
     }

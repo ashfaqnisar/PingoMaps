@@ -1,13 +1,11 @@
 package com.ezerka.pingo.fragments
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.ezerka.pingo.R
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,14 +37,6 @@ class NavigationNotificationsFragment : Fragment() {
         listener?.onFragmentInteraction(uri)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }
-    }
 
     override fun onDetach() {
         super.onDetach()

@@ -5,12 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.ezerka.pingo.R
+import timber.log.Timber
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -41,7 +41,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
             log("onAttach():Fragment is attached")
             makeToast("Fragment is attached")
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
@@ -68,11 +68,11 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun log(log: String) {
-        Log.v(TAG, "Log: $log")
+        Timber.d("Log: $log")
     }
 
     private fun logError(error: String) {
-        Log.e(TAG, "Log: $error")
+        Timber.e("Log Error: $error")
     }
 
     private fun makeToast(toast: String) {

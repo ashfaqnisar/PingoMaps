@@ -13,14 +13,15 @@
                 android:icon="@drawable/ic_icon_calender"
                 android:title="@string/menu_trips"/>
         <item
-                android:id="@+id/nav_notifications"
-                android:icon="@drawable/ic_icon_plus"
-                android:title="@string/menu_notifications"/>
-        <item
                 android:id="@+id/nav_payments"
                 android:icon="@drawable/ic_icon_payment"
                 android:title="@string/menu_payments">
         </item>
+        <item
+                android:id="@+id/nav_notifications"
+                android:icon="@drawable/ic_icon_plus"
+                android:title="@string/menu_notifications"/>
+
         <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_icon_settings"

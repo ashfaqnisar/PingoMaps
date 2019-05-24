@@ -377,5 +377,6 @@ class MainActivity : AppCompatActivity(),
     override fun onDestroy() {
         super.onDestroy()
         log("onDestroy(): Activity Destroy")
+        mAuth!!.removeAuthStateListener(mAuthListener!!)
     }
 }

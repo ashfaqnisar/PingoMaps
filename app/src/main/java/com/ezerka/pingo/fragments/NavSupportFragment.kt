@@ -19,10 +19,6 @@ class NavSupportFragment : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         log("onCreate():Init")
-        assignTheVariables()
-    }
-
-    private fun assignTheVariables() {
     }
 
     override fun onCreateView(
@@ -56,7 +52,7 @@ class NavSupportFragment : BottomSheetDialogFragment() {
             log("onAttach():Fragment is attached")
             makeToast("Fragment is attached")
         } else {
-            throw RuntimeException("$context must implement OnFragmentInteractionListener")
+            //throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 

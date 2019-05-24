@@ -52,7 +52,7 @@ class NavSettingsFragment : BottomSheetDialogFragment() {
             log("onAttach():Fragment is attached")
             makeToast("Fragment is attached")
         } else {
-            throw RuntimeException("$context must implement OnFragmentInteractionListener")
+            //throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 

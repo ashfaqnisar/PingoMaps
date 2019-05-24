@@ -4,15 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+
 import com.ezerka.pingo.R
 import timber.log.Timber
 
-class NavTripsFragment : BottomSheetDialogFragment() {
+
+class TripsHistoryFragment : Fragment() {
 
     private var listener: OnFragmentInteractionListener? = null
 
@@ -21,14 +23,12 @@ class NavTripsFragment : BottomSheetDialogFragment() {
         log("onCreate():Init")
     }
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         log("onCreateView(): Fragment is created")
-        val view = inflater.inflate(R.layout.fragment_nav_trips, container, false)
+        val view = inflater.inflate(R.layout.fragment_trips_history, container, false)
         assignTheViews(view)
         assignTheLinks()
         assignTheMethods()
@@ -47,22 +47,19 @@ class NavTripsFragment : BottomSheetDialogFragment() {
 
     }
 
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
             listener = context
-            log("onAttach():Fragment is attached")
-            makeToast("Fragment is attached")
         } else {
-            //throw RuntimeException("$context must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
     override fun onDetach() {
         super.onDetach()
         listener = null
-        log("onDetach():Fragment is detached")
-
     }
 
 
@@ -87,5 +84,6 @@ class NavTripsFragment : BottomSheetDialogFragment() {
         val intent = Intent(context, mClass)
         startActivity(intent)
     }
+
 
 }

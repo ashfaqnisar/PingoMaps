@@ -53,6 +53,7 @@ class TripsUpcomingFragment : Fragment() {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
             listener = context
+            log("onAttach():Fragment is attached")
         } else {
             throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }

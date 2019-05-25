@@ -35,7 +35,9 @@ import com.google.firebase.auth.FirebaseUser
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity(),
-    NavigationView.OnNavigationItemSelectedListener, NavHomeFragment.OnFragmentInteractionListener {
+    NavigationView.OnNavigationItemSelectedListener, NavHomeFragment.OnFragmentInteractionListener,
+    NavTripsFragment.OnFragmentInteractionListener, TripsHistoryFragment.OnFragmentInteractionListener,
+    TripsUpcomingFragment.OnFragmentInteractionListener {
 
     private var mNavViewItemIndex: Int = 0
     private lateinit var mNavTitleArray: Array<String>
@@ -182,9 +184,8 @@ class MainActivity : AppCompatActivity(),
 
             R.id.nav_trips -> {
                 log("onNavigationItemSelected():Trips Clicked:")
-                startTheActivity(TripsActivity::class.java)
-                /* mNavViewItemIndex = 1
-                 mNavActivityTag = TAG_TRIPS*/
+                mNavViewItemIndex = 1
+                mNavActivityTag = TAG_TRIPS
 
                 makeToast("Trips Clicked")
             }

@@ -2,26 +2,38 @@ package com.ezerka.pingo.adapters
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.app.FragmentStatePagerAdapter
+import com.ezerka.pingo.fragments.TripsHistoryFragment
+import com.ezerka.pingo.fragments.TripsUpcomingFragment
 
-class TripsViewPagerAdapter(manager: FragmentManager) : FragmentPagerAdapter(manager) {
+class TripsViewPagerAdapter(manager: FragmentManager) : FragmentStatePagerAdapter(manager) {
+
+    private var mTabNameList: ArrayList<String> = ArrayList()
     override fun getCount(): Int {
-        return mFragmentList.size
+        return mTabNameList.size
     }
-
-    private val mFragmentList: ArrayList<Fragment> = ArrayList()
-    private val mFragmentTitleList: ArrayList<String> = ArrayList()
 
     override fun getItem(position: Int): Fragment {
-        return mFragmentList[position]
+        return when (position) {
+            0 -> {
+                TripsHistoryFragment()
+            }
+            1 -> {
+                TripsUpcomingFragment()
+            }
+            else -> {
+                TripsHistoryFragment()
+            }
+        }
     }
 
-    fun addFragment(fragment: Fragment, title: String) {
-        mFragmentList.add(fragment)
-        mFragmentTitleList.add(title)
+    override fun getPageTitle(position: Int): CharSequence? {
+        return mTabNameList[position]
     }
 
-    override fun getPageTitle(position: Int): CharSequence {
-        return mFragmentTitleList[position]
+    fun addFragment(tabName: String) {
+        mTabNameList.add(tabName)
     }
+
+
 }

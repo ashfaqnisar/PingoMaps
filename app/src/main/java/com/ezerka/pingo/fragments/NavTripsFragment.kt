@@ -5,20 +5,30 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
+import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.ezerka.pingo.R
+import com.ezerka.pingo.adapters.TripsViewPagerAdapter
 import timber.log.Timber
 
-class NavTripsFragment : BottomSheetDialogFragment() {
+class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFragmentInteractionListener,
+    TripsUpcomingFragment.OnFragmentInteractionListener {
 
+
+    private lateinit var mContext: Context
+    private lateinit var mTabLayout: TabLayout
+    private lateinit var mViewPager: ViewPager
+    private lateinit var mViewPagerAdapter: TripsViewPagerAdapter
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         log("onCreate():Init")
+        retainInstance = true
     }
 
 
@@ -35,12 +45,54 @@ class NavTripsFragment : BottomSheetDialogFragment() {
         return view
     }
 
-    private fun assignTheViews(view: View?) {
+
+    override fun onFragmentInteraction(uri: Uri) {
+    }
+
+    private fun assignTheViews(view: View) {
+        mContext = context!!
+
+
+        mViewPager = view.findViewById(R.id.id_ViewPager)
+
+
+        mTabLayout = view.findViewById(R.id.id_Tabs_TripActivity)
+        mTabLayout.tabGravity = TabLayout.GRAVITY_FILL
+        setupViewPager(mViewPager)
+
+        mTabLayout.setupWithViewPager(mViewPager)
+
 
     }
 
-    private fun assignTheLinks() {
+    private fun setupViewPager(mViewPager: ViewPager?) {
+        mViewPagerAdapter = TripsViewPagerAdapter(fragmentManager!!)
+        mViewPagerAdapter.addFragment("History")
+        mViewPagerAdapter.addFragment("Upcoming")
 
+
+        if (::mViewPagerAdapter.isInitialized) {
+            mViewPager!!.adapter = mViewPagerAdapter
+        }
+    }
+
+    private fun assignTheLinks() {
+        mViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(mTabLayout))
+
+        mTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                mViewPager.currentItem = tab!!.position
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+        })
     }
 
     private fun assignTheMethods() {
@@ -88,4 +140,8 @@ class NavTripsFragment : BottomSheetDialogFragment() {
         startActivity(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        log("onResume():init")
+    }
 }

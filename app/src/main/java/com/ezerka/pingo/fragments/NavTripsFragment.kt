@@ -32,7 +32,6 @@ class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFra
     }
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,45 +49,37 @@ class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFra
     }
 
     private fun assignTheViews(view: View) {
-        mContext = context!!
-
 
         mViewPager = view.findViewById(R.id.id_ViewPager)
 
-
         mTabLayout = view.findViewById(R.id.id_Tabs_TripActivity)
         mTabLayout.tabGravity = TabLayout.GRAVITY_FILL
-        setupViewPager(mViewPager)
 
-        mTabLayout.setupWithViewPager(mViewPager)
+        mTabLayout.addTab(mTabLayout.newTab().setText("History"))
+        mTabLayout.addTab(mTabLayout.newTab().setText("Upcoming"))
 
+        setupViewPager()
 
     }
 
-    private fun setupViewPager(mViewPager: ViewPager?) {
-        mViewPagerAdapter = TripsViewPagerAdapter(fragmentManager!!)
-        mViewPagerAdapter.addFragment("History")
-        mViewPagerAdapter.addFragment("Upcoming")
-
-
-        if (::mViewPagerAdapter.isInitialized) {
-            mViewPager!!.adapter = mViewPagerAdapter
-        }
+    private fun setupViewPager() {
+        mViewPagerAdapter = TripsViewPagerAdapter(fragmentManager!!, mTabLayout.tabCount)
+        mViewPager.adapter = mViewPagerAdapter
     }
 
     private fun assignTheLinks() {
         mViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(mTabLayout))
 
         mTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                mViewPager.currentItem = tab!!.position
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                mViewPager.currentItem = tab.position
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            override fun onTabUnselected(tab: TabLayout.Tab) {
 
             }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
+            override fun onTabReselected(tab: TabLayout.Tab) {
 
             }
 

@@ -6,11 +6,10 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import com.ezerka.pingo.fragments.TripsHistoryFragment
 import com.ezerka.pingo.fragments.TripsUpcomingFragment
 
-class TripsViewPagerAdapter(manager: FragmentManager) : FragmentStatePagerAdapter(manager) {
+class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int) : FragmentStatePagerAdapter(manager) {
 
-    private var mTabNameList: ArrayList<String> = ArrayList()
     override fun getCount(): Int {
-        return mTabNameList.size
+        return tabCount
     }
 
     override fun getItem(position: Int): Fragment {
@@ -25,14 +24,6 @@ class TripsViewPagerAdapter(manager: FragmentManager) : FragmentStatePagerAdapte
                 TripsHistoryFragment()
             }
         }
-    }
-
-    override fun getPageTitle(position: Int): CharSequence? {
-        return mTabNameList[position]
-    }
-
-    fun addFragment(tabName: String) {
-        mTabNameList.add(tabName)
     }
 
 

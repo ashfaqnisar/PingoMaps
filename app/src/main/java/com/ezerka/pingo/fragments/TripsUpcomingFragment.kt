@@ -5,18 +5,24 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
-
 import com.ezerka.pingo.R
+import com.ezerka.pingo.adapters.TripsUpcomingRecyclerAdapter
+import com.ezerka.pingo.models.AddressData
 import timber.log.Timber
 
 
 class TripsUpcomingFragment : Fragment() {
 
     private var listener: OnFragmentInteractionListener? = null
+    private lateinit var mRecyclerView: RecyclerView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +43,7 @@ class TripsUpcomingFragment : Fragment() {
     }
 
     private fun assignTheViews(view: View?) {
+        mRecyclerView = view!!.findViewById(R.id.id_Recycler_Upcoming_Content)
 
     }
 
@@ -45,7 +52,21 @@ class TripsUpcomingFragment : Fragment() {
     }
 
     private fun assignTheMethods() {
+        getTheList()
+    }
 
+    private fun getTheList() {
+        mRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+
+        val addresses = ArrayList<AddressData>()
+
+        addresses.add(AddressData("Hyderabad", "Attapur"))
+        addresses.add(AddressData("Charminar", "Telangana"))
+
+        addresses.add(AddressData("CTC", "Aziz Nagar"))
+
+        val adapterWithContent = TripsUpcomingRecyclerAdapter(context!!, addresses)
+        mRecyclerView.adapter = adapterWithContent
     }
 
 

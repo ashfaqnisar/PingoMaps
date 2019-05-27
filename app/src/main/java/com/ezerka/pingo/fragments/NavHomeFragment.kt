@@ -681,8 +681,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         } catch (error: IOException) {
             error.stackTrace
             logError("getAddressFromLocation():IOException: Error: $error")
-            makeToast("Could Not Get Address $error")
-            return "Could Not Get the Address"
+            makeToast("Could Not Get BothAddress $error")
+            return "Could Not Get the BothAddress"
         }
     }
 

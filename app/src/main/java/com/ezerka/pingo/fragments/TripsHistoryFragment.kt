@@ -5,18 +5,24 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 
 import com.ezerka.pingo.R
+import com.ezerka.pingo.adapters.TripsHistoryRecyclerAdapter
+import com.ezerka.pingo.models.AddressData
 import timber.log.Timber
 
 
 class TripsHistoryFragment : Fragment() {
 
     private var listener: OnFragmentInteractionListener? = null
+    private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +42,8 @@ class TripsHistoryFragment : Fragment() {
     }
 
     private fun assignTheViews(view: View?) {
-
+        mRecyclerView = view!!.findViewById(R.id.id_Recycler_History_Content)
+//        mRecyclerView.layoutManager = LinearLayoutManager(context)
     }
 
     private fun assignTheLinks() {
@@ -44,7 +51,19 @@ class TripsHistoryFragment : Fragment() {
     }
 
     private fun assignTheMethods() {
+        getTheList()
+    }
 
+    private fun getTheList() {
+        mRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+
+        val addresses = ArrayList<AddressData>()
+
+        addresses.add(AddressData("Hyderabad", "Attapur"))
+        addresses.add(AddressData("Charminar", "Telangana"))
+
+        val adapterWithContent = TripsHistoryRecyclerAdapter(context!!, addresses)
+        mRecyclerView.adapter = adapterWithContent
     }
 
 

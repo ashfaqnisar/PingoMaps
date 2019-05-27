@@ -175,11 +175,11 @@ class MainActivity : AppCompatActivity(),
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.nav_home -> {
-                log("onNavigationItemSelected():Home Clicked:")
+
                 mNavViewItemIndex = 0
                 mNavActivityTag = TAG_HOME
-
-                makeToast("Home Clicked")
+                checkTheFragmentIsActive(menuItem, TAG_HOME)
+                log("Home Clicked")
             }
 
             R.id.nav_trips -> {
@@ -187,19 +187,25 @@ class MainActivity : AppCompatActivity(),
                 mNavViewItemIndex = 1
                 mNavActivityTag = TAG_TRIPS
 
-                makeToast("Trips Clicked")
+                checkTheFragmentIsActive(menuItem, TAG_TRIPS)
+
+                log("Trips Clicked")
             }
 
             R.id.nav_payments -> {
                 log("onNavigationItemSelected():Payments Clicked:")
                 mNavViewItemIndex = 2
                 mNavActivityTag = TAG_PAYMENTS
+                checkTheFragmentIsActive(menuItem, TAG_PAYMENTS)
+
             }
 
             R.id.nav_notifications -> {
                 log("onNavigationItemSelected():Notifications Clicked:")
                 mNavViewItemIndex = 3
                 mNavActivityTag = TAG_NOTIFICATIONS
+                checkTheFragmentIsActive(menuItem, TAG_NOTIFICATIONS)
+
 
             }
 
@@ -207,12 +213,16 @@ class MainActivity : AppCompatActivity(),
                 log("onNavigationItemSelected():Settings Clicked:")
                 mNavViewItemIndex = 4
                 mNavActivityTag = TAG_SETTINGS
+                checkTheFragmentIsActive(menuItem, TAG_SETTINGS)
+
             }
 
             R.id.nav_support -> {
                 log("onNavigationItemSelected():Support  Clicked:")
                 mNavViewItemIndex = 5
                 mNavActivityTag = TAG_SUPPORT
+                checkTheFragmentIsActive(menuItem, TAG_SUPPORT)
+
             }
 
             R.id.nav_logout -> {
@@ -224,16 +234,29 @@ class MainActivity : AppCompatActivity(),
                 log("onNavigationItemSelected():Default : User To Home")
                 mNavViewItemIndex = 0
                 mNavActivityTag = TAG_HOME
+                checkTheFragmentIsActive(menuItem, TAG_HOME)
+
             }
 
         }
 
-        menuItem.isChecked = !menuItem.isChecked
-
-        loadTheFetchedFragment()
-
         mDrawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun checkTheFragmentIsActive(menuItem: MenuItem, TAG: String) {
+        if (menuItem.isChecked) {
+            log("onNavigationItemSelected():$TAG :It is already enabled")
+            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                mDrawerLayout.closeDrawer(GravityCompat.START)
+                log("onBackPressed():Closed the drawer")
+            }
+        } else {
+            log("It is not enabled")
+            log("onNavigationItemSelected():$TAG Clicked:")
+            loadTheFetchedFragment()
+        }
+
     }
 
     private fun loadTheFetchedFragment() {
@@ -266,36 +289,38 @@ class MainActivity : AppCompatActivity(),
 
     private fun getActiveFragment(): Fragment {
         log("getActiveFragment():init")
-        when (mNavViewItemIndex) {
+
+        return when (mNavViewItemIndex) {
             0 -> {
-                return NavHomeFragment()
+                NavHomeFragment()
             }
 
             1 -> {
-                return NavTripsFragment()
+                NavTripsFragment()
             }
 
             2 -> {
-                return NavPaymentFragment()
+                NavPaymentFragment()
             }
 
             3 -> {
-                return NavNotificationsFragment()
+                NavNotificationsFragment()
             }
 
             4 -> {
-                return NavSettingsFragment()
+                NavSettingsFragment()
             }
 
             5 -> {
-                return NavSupportFragment()
+                NavSupportFragment()
             }
 
             else -> {
-                return NavHomeFragment()
+                NavHomeFragment()
             }
         }
     }
+
 
     private fun setupTheNavigationHeader() {
         Glide.with(this)

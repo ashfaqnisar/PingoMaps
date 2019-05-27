@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.design.widget.TabLayout
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +20,6 @@ class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFra
     TripsUpcomingFragment.OnFragmentInteractionListener {
 
 
-    private lateinit var mContext: Context
     private lateinit var mTabLayout: TabLayout
     private lateinit var mViewPager: ViewPager
     private lateinit var mViewPagerAdapter: TripsViewPagerAdapter
@@ -57,6 +57,10 @@ class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFra
 
         mTabLayout.addTab(mTabLayout.newTab().setText("History"))
         mTabLayout.addTab(mTabLayout.newTab().setText("Upcoming"))
+        mTabLayout.setTabTextColors(
+            ContextCompat.getColor(context!!, R.color.divider),
+            ContextCompat.getColor(context!!, R.color.icons)
+        )
 
         setupViewPager()
 

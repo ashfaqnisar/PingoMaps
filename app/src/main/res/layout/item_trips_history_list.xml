@@ -1,70 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
-<android.support.v7.widget.CardView
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/id_Cardview_History"
-        android:layout_height="100dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginTop="8dp"
-        app:cardElevation="10dp"
-        app:cardCornerRadius="5dp"
-        app:cardUseCompatPadding="false"
-        android:focusedByDefault="true">
-    <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:orientation="vertical">
 
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-                android:id="@+id/id_Linear_Pickup_History">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Jan 10 - 12:30PM"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="12sp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"/>
+
+    <android.support.v7.widget.CardView
+
+            android:layout_width="match_parent"
+            android:id="@+id/id_Cardview_History"
+            android:layout_height="100dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginTop="8dp"
+            app:cardElevation="5dp"
+            app:cardCornerRadius="5dp"
+            app:cardUseCompatPadding="false"
+            android:focusedByDefault="true">
+        <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+                    android:id="@+id/id_Linear_Pickup_History">
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:layout_gravity="center_vertical"
+                        app:srcCompat="@drawable/ic_float_background"
+                        android:id="@+id/id_Image_Pickup_Icon"
+                        android:scaleType="centerInside"
+                        android:cropToPadding="false"
+                        android:adjustViewBounds="true" android:padding="10dp"
+                        android:contentDescription="@string/pickup_icon"/>
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical">
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pickup Location"
+                            android:textSize="12sp"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                            android:layout_marginTop="8dp"/>
+                    <TextView
+                            android:text="@string/pickup_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/id_Text_Trips_Pickup_Address"
+                            android:textSize="16sp"
+                            android:gravity="center_vertical"
+                            android:foregroundGravity="center_vertical"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+                </LinearLayout>
+
+
+            </LinearLayout>
             <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="37dp" app:srcCompat="@drawable/ic_float_background"
-                    android:id="@+id/id_Image_Pickup_Icon" android:scaleType="centerInside"
-                    android:cropToPadding="false"
-                    android:adjustViewBounds="true" android:padding="10dp"
-                    android:foregroundGravity="center_vertical|center_horizontal"
-                    android:contentDescription="@string/pickup_icon"/>
-            <TextView
-                    android:text="@string/pickup_address"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" android:id="@+id/id_Text_Trips_Pickup_Address"
-                    android:textSize="16sp" android:gravity="center_vertical"
-                    android:foregroundGravity="center_vertical"/>
-        </LinearLayout>
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="0dp"
-                android:id="@+id/id_Linear_Dest_History"
-                android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
-            <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="37dp"
-                    app:srcCompat="@drawable/ic_float_background"
-                    android:id="@+id/id_Image_Dest_Icon"
-                    android:scaleType="centerInside"
-                    android:cropToPadding="false"
-                    android:adjustViewBounds="true" android:padding="10dp"
-                    android:foregroundGravity="center_vertical|center_horizontal"
-                    android:contentDescription="@string/destination_icon"/>
-            <TextView
-                    android:text="@string/destination_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/id_Text_Trips_Dest_Address"
-                    android:textSize="16sp" android:gravity="center_vertical"
-                    android:foregroundGravity="center_vertical"/>
-        </LinearLayout>
-    </android.support.constraint.ConstraintLayout>
-</android.support.v7.widget.CardView>
+                    android:layout_height="3dp"
+                    android:src="@drawable/ic_line"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintTop_toBottomOf="@+id/id_Linear_Pickup_History"
+                    app:layout_constraintBottom_toTopOf="@+id/id_Linear_Dest_History"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" android:contentDescription="Divider"/>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="0dp"
+                    android:id="@+id/id_Linear_Dest_History"
+                    android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_float_background"
+                        android:id="@+id/id_Image_Dest_Icon"
+                        android:scaleType="centerInside"
+                        android:cropToPadding="false"
+                        android:layout_gravity="center_vertical"
+                        android:adjustViewBounds="true" android:padding="10dp"
+                        android:foregroundGravity="center_vertical|center_horizontal"
+                        android:contentDescription="@string/destination_icon"/>
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <TextView android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:text="Destination Location"
+                              android:textSize="12sp"
+                              android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                    <TextView
+                            android:text="@string/destination_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/id_Text_Trips_Dest_Address"
+                            android:textSize="16sp"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp"
+                            android:foregroundGravity="center_vertical"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

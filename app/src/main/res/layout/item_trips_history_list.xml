@@ -3,7 +3,7 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_height="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:orientation="vertical">
 
@@ -40,12 +40,17 @@
             <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-                    android:id="@+id/id_Linear_Pickup_History">
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:paddingTop="8dp"
+                    android:id="@+id/id_Linear_Pickup_History"
+            >
                 <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="37dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:layout_gravity="center_vertical"
                         app:srcCompat="@drawable/ic_float_background"
                         android:id="@+id/id_Image_Pickup_Icon"
@@ -54,17 +59,19 @@
                         android:adjustViewBounds="true" android:padding="10dp"
                         android:contentDescription="@string/pickup_icon"/>
                 <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="9"
+                        android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+
+                >
                     <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Pickup Location"
                             android:textSize="12sp"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:layout_marginTop="8dp"/>
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
                     <TextView
                             android:text="@string/pickup_address"
                             android:layout_width="match_parent"
@@ -78,35 +85,28 @@
 
 
             </LinearLayout>
-            <!--
-                        <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="3dp"
-                                android:src="@drawable/ic_line"
-                                android:scaleType="centerCrop"
 
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" android:contentDescription="Divider"/>
-            -->
             <View
                     android:id="@+id/divider"
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
                     android:background="@color/divider"
-                    tools:layout_editor_absoluteY="46dp"
-                    tools:layout_editor_absoluteX="8dp"
+                    android:foregroundGravity="center"
                     app:layout_constraintTop_toBottomOf="@+id/id_Linear_Pickup_History"
-                    app:layout_constraintBottom_toTopOf="@+id/id_Linear_Dest_History"/>
+                    app:layout_constraintBottom_toTopOf="@+id/id_Linear_Dest_History"
+                    app:layout_constraintStart_toStartOf="parent"/>
             <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="0dp"
                     android:id="@+id/id_Linear_Dest_History"
                     android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    android:paddingBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent">
                 <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="37dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
                         app:srcCompat="@drawable/ic_float_background"
                         android:id="@+id/id_Image_Dest_Icon"
                         android:scaleType="centerInside"
@@ -116,8 +116,9 @@
                         android:foregroundGravity="center_vertical|center_horizontal"
                         android:contentDescription="@string/destination_icon"/>
                 <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="9"
+                        android:layout_height="match_parent"
                         android:orientation="vertical">
 
                     <TextView android:layout_width="match_parent"
@@ -132,7 +133,6 @@
                             android:id="@+id/id_Text_Trips_Dest_Address"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp"
                             android:foregroundGravity="center_vertical"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 

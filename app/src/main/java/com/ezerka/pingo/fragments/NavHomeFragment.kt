@@ -29,9 +29,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-
 import com.ezerka.pingo.R
 import com.ezerka.pingo.models.PolylineData
+import com.ezerka.pingo.models.UserData
+import com.ezerka.pingo.models.UserLocationData
 import com.ezerka.pingo.ui.BookingInputsActivity
 import com.ezerka.pingo.util.Constants
 import com.google.android.gms.common.ConnectionResult
@@ -50,6 +51,9 @@ import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.maps.DirectionsApiRequest
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
@@ -89,6 +93,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     private var mPickupMarker: Marker? = null
     private var mDestinationMarker: Marker? = null
     private var mGeoApiContext: GeoApiContext? = null
+    private var mUserLocation: UserLocationData? = null
+
 
     private lateinit var mMapFragment: SupportMapFragment
     private lateinit var mMap: GoogleMap
@@ -104,6 +110,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     private var mAuth: FirebaseAuth? = null
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
+    private lateinit var mDatabase: FirebaseFirestore
+
 
     private var listener: OnFragmentInteractionListener? = null
 
@@ -176,6 +184,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                 log("User is signed out")
             }
         }
+        mDatabase = FirebaseFirestore.getInstance()
     }
 
     private fun assignTheLinks() {
@@ -212,6 +221,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
     private fun assignTheMethods() {
         requestTheMapPermission()
+
+        getUserDetails()
 
     }
 
@@ -526,6 +537,27 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         }
     }
 
+    private fun getUserDetails() {
+        if (mUserLocation == null) {
+            mUserLocation = UserLocationData()
+
+            val userRef = mDatabase.collection("Users").document("ashfaq")
+
+            userRef.get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    log("getUserDetails():OnComplete:Success")
+
+                    val fetchedUser: UserData = task.result!!.toObject(UserData::class.java) as UserData
+                    log(fetchedUser.toString())
+                    mUserLocation!!.user = fetchedUser
+                } else {
+                    logError("getUserDetails: Error: {$task.exception}")
+                }
+            }
+        }
+
+    }
+
     private fun getTheUserLocation() {
         if (ActivityCompat.checkSelfPermission(
                 context!!,
@@ -540,18 +572,41 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             logError("getTheUserLocation():GPS is not enabled")
             makeToast("Please enable the GPS to find your location")
         } else {
+            getUserDetails()
             mMap.isMyLocationEnabled = true
 
             mFusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     mLastLocation = location
                     val currentLatLng = LatLng(location.latitude, location.longitude)
+                    val userGeoPoint = GeoPoint(location.latitude, location.longitude)
+
+                    mUserLocation!!.geoPoint = userGeoPoint
+                    mUserLocation!!.timestamp = null
+                    storeTheUserLocation()
+
 
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
                 }
             }
         }
 
+    }
+
+    private fun storeTheUserLocation() {
+        log("storeTheUserLocation():init")
+
+        val locationReference: DocumentReference =
+            mDatabase.collection("Users Location").document(mAuth?.uid.toString())
+
+        locationReference.set(mUserLocation!!).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                log("storeTheUserLocation():onComplete:Success: Data Store Successfully")
+                log("Latitude: ${mUserLocation?.geoPoint?.latitude}")
+                log("Longitude: ${mUserLocation?.geoPoint?.longitude}")
+
+            }
+        }
     }
 
     private fun openPickupAutocomplete() {

@@ -19,6 +19,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -30,8 +31,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.*
+import com.ezerka.pingo.models.UserData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity(),
@@ -52,9 +55,11 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mHandler: Handler
     private lateinit var mActiveFragment: Fragment
     private lateinit var mContext: Context
+    private lateinit var mUserData: UserData
 
     //Normal Variables
     private lateinit var mThumbnailImageView: ImageView
+    private lateinit var mNameTextView: TextView
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mNavigationView: NavigationView
     private lateinit var mNavigationHeader: View
@@ -65,6 +70,7 @@ class MainActivity : AppCompatActivity(),
     private var mAuth: FirebaseAuth? = null
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
+    private lateinit var mDatabase: FirebaseFirestore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,6 +108,7 @@ class MainActivity : AppCompatActivity(),
         mNavigationHeader = mNavigationView.getHeaderView(0)
 
         mThumbnailImageView = mNavigationHeader.findViewById(R.id.id_Image_Thumbnail)
+        mNameTextView = mNavigationHeader.findViewById(R.id.id_Text_Username)
         mHandler = Handler()
 
         mActiveFragment = getActiveFragment()
@@ -121,6 +128,10 @@ class MainActivity : AppCompatActivity(),
             }
         }
 
+        mUserData = UserData()
+
+        mDatabase = FirebaseFirestore.getInstance()
+
     }
 
     private fun assignTheLinks() {
@@ -129,8 +140,24 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun assignTheMethods() {
-        setupTheNavigationHeader()
+        fetchUserData()
+    }
 
+    private fun fetchUserData() {
+        val ref = mDatabase.collection("Users").document("ashfaq")
+
+        ref.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                log("fetchUserDetails():OnComplete:Success")
+
+                val fetchedUser: UserData = task.result!!.toObject(UserData::class.java) as UserData
+                log("fetchedUserData: $fetchedUser")
+                mUserData = fetchedUser
+                setupTheNavigationHeader()
+            } else {
+                logError("fetchUserDetails: Error: {$task.exception}")
+            }
+        }
     }
 
     override fun onFragmentInteraction(uri: Uri) {
@@ -268,7 +295,7 @@ class MainActivity : AppCompatActivity(),
             mDrawerLayout.closeDrawers()
         }
 
-        var mRunnable = Runnable {
+        val mRunnable = Runnable {
             val fragment = getActiveFragment()
             val fragmentTransaction = supportFragmentManager.beginTransaction()
 
@@ -324,7 +351,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun setupTheNavigationHeader() {
         Glide.with(this)
-            .load("https://avatars1.githubusercontent.com/u/20638539?s=460&v=4")
+            .load(mUserData.avatar.toString())
             .listener(object : RequestListener<Drawable> {
 
                 override fun onLoadFailed(
@@ -354,8 +381,10 @@ class MainActivity : AppCompatActivity(),
             .apply(RequestOptions.bitmapTransform(CircleCrop()).error(R.drawable.ic_detective))
             .thumbnail(0.5f)
             .into(mThumbnailImageView)
-
+        log("Glide: ${mUserData.avatar.toString()}")
         mNavigationView.menu.getItem(3).setActionView(R.layout.comp_dot) //Placing dot on the notifications fragment
+
+        mNameTextView.text = mUserData.name
     }
 
 

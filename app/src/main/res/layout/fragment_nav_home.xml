@@ -97,7 +97,7 @@
                 android:layout_height="0dp"
                 android:tag="tag_map_fragment" android:layout_gravity="center"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/id_But_PlaceThePickup"
+                app:layout_constraintBottom_toTopOf="@+id/id_Nested_View"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
         </fragment>
@@ -127,23 +127,39 @@
                 app:backgroundTint="@color/colorPrimary"
                 android:id="@+id/id_Float_But_GetMyLocation"
                 android:layout_marginBottom="60dp"
-                app:layout_constraintBottom_toTopOf="@+id/id_But_PlaceThePickup"
+                app:layout_constraintBottom_toTopOf="@+id/id_Nested_View"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
 
         />
-        <Button
-                android:text="@string/place_pickup"
-                android:textColor="@color/quantum_white_100"
-                android:layout_width="0dp"
-                android:background="@drawable/ic_button_background"
-                android:layout_height="58dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                android:id="@+id/id_But_PlaceThePickup"
-                android:foreground="?attr/selectableItemBackground"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+        <android.support.v4.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/id_Nested_View"
+                android:fillViewport="true"
+                android:nestedScrollingEnabled="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                <Button
+                        android:text="@string/place_pickup"
+                        android:textColor="@color/quantum_white_100"
+                        android:layout_width="match_parent"
+                        android:background="@drawable/ic_button_background"
+                        android:layout_height="match_parent"
+                        android:stateListAnimator="@animator/lift_on_touch"
+                        android:id="@+id/id_But_PlaceThePickup"
+                        android:foreground="?attr/selectableItemBackground"
+                />
+
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+
     </android.support.constraint.ConstraintLayout>
 
 </FrameLayout>

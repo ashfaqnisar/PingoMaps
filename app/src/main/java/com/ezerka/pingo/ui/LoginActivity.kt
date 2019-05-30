@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import timber.log.Timber
 
 
@@ -38,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
+    private var mDatabase: FirebaseFirestore? = null
 
     //Google Variables
     private var mGoogleClient: GoogleSignInClient? = null
@@ -78,6 +80,8 @@ class LoginActivity : AppCompatActivity() {
                 log("User is signed out")
             }
         }
+
+        mDatabase = FirebaseFirestore.getInstance()
 
         val mGoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.id_token_google))

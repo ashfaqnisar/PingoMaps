@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
 import com.ezerka.pingo.R
+import com.ezerka.pingo.models.UserData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,6 +33,8 @@ class RegisterActivity : AppCompatActivity() {
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
     private var mDatabase: FirebaseFirestore? = null
+
+    private lateinit var mUserData: UserData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +62,8 @@ class RegisterActivity : AppCompatActivity() {
         mUser = mAuth!!.currentUser
 
         mDatabase = FirebaseFirestore.getInstance()
+
+        mUserData = UserData()
     }
 
     private fun assignTheLinks() {
@@ -86,12 +91,8 @@ class RegisterActivity : AppCompatActivity() {
 
             mAuth!!.createUserWithEmailAndPassword(sEmail, sPass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    closeLoadingBar("registerTheUser()")
                     log("registerTheUser: Task Successful: User Registered: ${mAuth!!.uid}")
-
-                    mAuth!!.signOut()
-                    log("registerTheUser: Signing out the user.")
-                    startTheActivity(LoginActivity::class.java)
+                    storeTheDataOnDB()
                     makeToast("Registered  Successfully ")
                 } else {
                     closeLoadingBar("registerTheUser: Failure Listener")
@@ -105,26 +106,39 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun storeTheDataOnDB() {
+        log("storeTheDataOnDB():init")
         val userId: String = mAuth!!.currentUser!!.uid
 
-        val userDetails = HashMap<String, Any>()
-        userDetails["Email Id"] = "Ashfaq"
-        userDetails["Password"] = "Hello world"
-        userDetails["Mobile"] = "8328277518"
+        /*val userDetails = HashMap<String, Any>()
+        userDetails["avatar"] = ""
+        userDetails["name"] = "Ashfaq"
+        userDetails["email"] = mEmailRegisterET.text.toString().trim()
+        userDetails["user_id"] = userId.trim()
+        userDetails["mobile"] = mMobileRegisterET.text.toString().trim()*/
 
-        mDatabase!!.collection("Users")
-            .document("drivers")
-            .collection(userId)
-            .add(userDetails)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    log("storeTheDataOnDB():Task Success(): Data has been successfully stored ")
-                    makeToast("Data Stored Successfully")
-                } else {
-                    logError("storeTheDataOnDB():Task Failed: Unable to store the data " + task.exception)
-                    makeToast("Error: " + task.exception.toString())
-                }
+        mUserData.name = "Ashfaq"
+        mUserData.email = mEmailRegisterET.text.toString().trim()
+        mUserData.user_id = userId
+        mUserData.mobile = mMobileRegisterET.text.toString().trim()
+
+
+        val userRef = mDatabase!!.collection("Users").document(userId)
+
+        userRef.set(mUserData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                closeLoadingBar("storeTheDataOnDB()")
+                log("storeTheDataOnDB():Task Success(): Data has been successfully stored ")
+                makeToast("Data Stored Successfully")
+                mAuth!!.signOut()
+                log("registerTheUser: Signing out the user.")
+                startTheActivity(LoginActivity::class.java)
+
+            } else {
+                logError("storeTheDataOnDB():Task Failed: Unable to store the data " + task.exception)
+                makeToast("Error: " + task.exception.toString())
             }
+        }
+
     }
 
     private fun checkForErrors(Email: String, Pass: String, Mobile: String): Boolean {

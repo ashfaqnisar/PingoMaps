@@ -143,22 +143,6 @@ class MainActivity : AppCompatActivity(),
         fetchUserData()
     }
 
-    private fun fetchUserData() {
-        val ref = mDatabase.collection("Users").document("ashfaq")
-
-        ref.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                log("fetchUserDetails():OnComplete:Success")
-
-                val fetchedUser: UserData = task.result!!.toObject(UserData::class.java) as UserData
-                log("fetchedUserData: $fetchedUser")
-                mUserData = fetchedUser
-                setupTheNavigationHeader()
-            } else {
-                logError("fetchUserDetails: Error: {$task.exception}")
-            }
-        }
-    }
 
     override fun onFragmentInteraction(uri: Uri) {
 
@@ -347,6 +331,24 @@ class MainActivity : AppCompatActivity(),
             }
         }
     }
+
+    private fun fetchUserData() {
+        val ref = mDatabase.collection("Users").document(FirebaseAuth.getInstance().uid!!)
+        log("fetchUserData():FirebaseAuth.getInstance().toString()")
+        ref.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                log("fetchUserDetails():OnComplete:Success")
+
+                val fetchedUser: UserData = task.result?.toObject(UserData::class.java) as UserData
+                log("fetchedUserData: $fetchedUser")
+                mUserData = fetchedUser
+                setupTheNavigationHeader()
+            } else {
+                logError("fetchUserDetails: Error: {$task.exception}")
+            }
+        }
+    }
+
 
 
     private fun setupTheNavigationHeader() {

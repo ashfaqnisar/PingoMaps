@@ -541,7 +541,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         if (mUserLocation == null) {
             mUserLocation = UserLocationData()
 
-            val userRef = mDatabase.collection("Users").document("ashfaq")
+            val userRef = mDatabase.collection("Users").document(FirebaseAuth.getInstance().uid!!)
 
             userRef.get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {

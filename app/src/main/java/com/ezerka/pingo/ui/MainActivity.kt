@@ -288,9 +288,7 @@ class MainActivity : AppCompatActivity(),
             fragmentTransaction.commitAllowingStateLoss()
         }
 
-        if (mRunnable != null) {
-            mHandler.post(mRunnable)
-        }
+        mHandler.post(mRunnable)
 
         mDrawerLayout.closeDrawers()
 

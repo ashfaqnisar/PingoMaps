@@ -14,7 +14,6 @@ import timber.log.Timber
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
-    private val TAG = "BottomSheetFragment: "
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,3 +1,6 @@
 package com.ezerka.pingo.models
 
-data class AddressData(val pickupAddress: String, val destAddress: String)
+data class AddressData(
+    var pickupAddress: String,
+    var destAddress: String
+)

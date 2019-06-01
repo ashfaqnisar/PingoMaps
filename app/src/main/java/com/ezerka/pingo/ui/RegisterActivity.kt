@@ -17,7 +17,6 @@ import timber.log.Timber
 class RegisterActivity : AppCompatActivity() {
 
     //Constant Variables
-    private val TAG: String = "RegisterActivity: "
     private lateinit var mContext: Context
 
     //Normal Variables
@@ -152,7 +151,7 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
 
-        if (Mobile.isEmpty()) {
+        if (Mobile.isEmpty() && Mobile.toInt() <= 10) {
             mMobileRegisterET.error = "Please, Enter the Mobile"
             return false
         }
@@ -193,11 +192,13 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        mAuth!!.addAuthStateListener(mAuthListener!!)
         log("onStart(): Init")
     }
 
     override fun onStop() {
         super.onStop()
+        mAuth!!.removeAuthStateListener { mAuthListener!! }
         log("onStop(): Init")
     }
 

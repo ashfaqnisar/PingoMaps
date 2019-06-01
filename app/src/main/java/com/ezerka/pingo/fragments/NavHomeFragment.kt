@@ -243,6 +243,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
         mMap.setOnPolylineClickListener(this)
         mMap.uiSettings.isZoomControlsEnabled = false
+        isCameraIdle()
     }
 
     override fun onAttach(context: Context) {
@@ -706,7 +707,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             mCenterLatLng = mMap.cameraPosition.target
             log("cameraIdle(): Getting the data from the mCenterLatLng ")
             log("Center Details: " + mCenterLatLng.latitude + "," + mCenterLatLng.longitude)
-            var address: String = getAddressFromLocation(mCenterLatLng.latitude, mCenterLatLng.longitude)
+            getAddressFromLocation(mCenterLatLng.latitude, mCenterLatLng.longitude)
         }
     }
 

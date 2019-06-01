@@ -90,32 +90,56 @@
         </android.support.v7.widget.CardView>
 
 
-        <fragment
-                android:id="@+id/mapFragment"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
+        <android.support.design.widget.CoordinatorLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:tag="tag_map_fragment" android:layout_gravity="center"
+                tools:layout_editor_absoluteX="8dp"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/id_Nested_View"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-        </fragment>
+                app:layout_constraintBottom_toTopOf="@+id/id_But_PlaceThePickup">
 
 
-        <ImageView
-                android:id="@+id/centerMarker"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_placeholder"
-                android:contentDescription="@string/centermarker"
-                app:layout_constraintEnd_toEndOf="@+id/mapFragment" android:layout_marginStart="8dp"
-                app:layout_constraintStart_toStartOf="@+id/mapFragment"
-                app:layout_constraintBottom_toBottomOf="@+id/mapFragment"
-                app:layout_constraintTop_toTopOf="@+id/mapFragment" app:layout_constraintHorizontal_bias="0.487"
-                app:layout_constraintVertical_bias="0.456">
-        </ImageView>
+            <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_anchorGravity="top"
+                    android:layout_gravity="top|center"
+                    app:layout_anchor="@id/id_Layout_bottom_sheet"
+            >
+                <fragment
+                        android:id="@+id/mapFragment"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:tag="tag_map_fragment"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+                </fragment>
+
+
+                <ImageView
+                        android:id="@+id/centerMarker"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_placeholder"
+                        android:contentDescription="@string/centermarker"
+                        app:layout_constraintEnd_toEndOf="@+id/mapFragment"
+                        android:layout_marginStart="8dp"
+                        app:layout_constraintStart_toStartOf="@+id/mapFragment"
+                        app:layout_constraintBottom_toBottomOf="@+id/mapFragment"
+                        app:layout_constraintTop_toTopOf="@+id/mapFragment"
+                        app:layout_constraintHorizontal_bias="0.487"
+                        app:layout_constraintVertical_bias="0.456">
+                </ImageView>
+            </android.support.constraint.ConstraintLayout>
+
+            <include
+                    layout="@layout/comp_bottom_sheet"
+                    android:id="@+id/id_Layout_bottom_sheet"/>
+
+        </android.support.design.widget.CoordinatorLayout>
 
 
         <android.support.design.widget.FloatingActionButton
@@ -127,37 +151,26 @@
                 app:backgroundTint="@color/colorPrimary"
                 android:id="@+id/id_Float_But_GetMyLocation"
                 android:layout_marginBottom="60dp"
-                app:layout_constraintBottom_toTopOf="@+id/id_Nested_View"
+                app:layout_constraintBottom_toTopOf="@+id/id_But_PlaceThePickup"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
 
         />
 
 
-        <android.support.v4.widget.NestedScrollView
+        <Button
+                android:text="@string/place_pickup"
+                android:textColor="@color/quantum_white_100"
                 android:layout_width="match_parent"
+                android:background="@drawable/ic_button_background"
                 android:layout_height="wrap_content"
-                android:id="@+id/id_Nested_View"
-                android:fillViewport="true"
+                android:stateListAnimator="@animator/lift_on_touch"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                <Button
-                        android:text="@string/place_pickup"
-                        android:textColor="@color/quantum_white_100"
-                        android:layout_width="match_parent"
-                        android:background="@drawable/ic_button_background"
-                        android:layout_height="match_parent"
-                        android:stateListAnimator="@animator/lift_on_touch"
-                        android:id="@+id/id_But_PlaceThePickup"
-                        android:foreground="?attr/selectableItemBackground"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                android:id="@+id/id_But_PlaceThePickup"
+                android:foreground="?attr/selectableItemBackground"
+        />
 
-            </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
 
     </android.support.constraint.ConstraintLayout>
 

@@ -1,2 +1,2 @@
 # Dev - Pingo
-The application is still in devlopment.App Unstable
+The application is still in development. App is unstable

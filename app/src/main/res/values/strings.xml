@@ -7,8 +7,6 @@
     <string name="searching_address">Searching Current Address</string>
     <string name="provide_permissions">Provide Permissions</string>
     <string name="please_provide_the_permissions">Please Provide the permissions</string>
-    <string name="place_pickup">Place Pickup</string>
-    <string name="pickup_address">Pickup Address</string>
     <string name="destination_address">Destination Address</string>
     <string name="centermarker">CenterMarker</string>
     <string name="title_activity_navigation">Pingo</string>
@@ -66,4 +64,12 @@
     <string name="tab_text_2">Tab 2</string>
     <string name="pickup_icon">Pickup Icon</string>
     <string name="destination_icon">Destination Icon</string>
+
+
+    <string name="pickup_address">Pickup Address</string>
+    <string name="loading_destination_address">Loading the Destination Address…</string>
+    <string name="ride_details">Ride Details</string>
+    <string name="loading_pickup_address">Loading the Pickup Address…</string>
+    <string name="Cost_of_ride">₹435.00</string>
+    <string name="place_pickup">Place Pickup</string>
 </resources>

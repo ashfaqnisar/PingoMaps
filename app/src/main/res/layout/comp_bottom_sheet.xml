@@ -9,34 +9,33 @@
         android:orientation="vertical"
         android:padding="@dimen/activity_margin"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="56dp"
+        app:behavior_peekHeight="55dp"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_vertical"
-            android:weightSum="3">
+            android:paddingBottom="@dimen/activity_margin">
 
         <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_margin"
-                android:layout_weight="2"
-                android:text="Order Details"
-                android:textColor="#444"
-                android:textSize="18dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:text="@string/ride_details"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp"
                 android:textStyle="bold"/>
 
         <TextView
                 android:layout_width="0dp"
-                android:gravity="right"
+                android:gravity="end"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:textStyle="bold"
-                android:textSize="15dp"
-                android:text="₹435.00">
+                android:textSize="15sp"
+                android:id="@+id/id_Text_Price_of_Ride"
+                android:text="@string/Cost_of_ride">
         </TextView>
 
     </LinearLayout>
@@ -45,25 +44,31 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chicken Fried Rice 1x1"/>
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Paneer Tikka 1x2"/>
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_margin"
-            android:text="Delivery Address"
-            android:textColor="#444"
+            android:text="@string/pickup_address"
+            android:textColor="@color/primary_text"
             android:textStyle="bold"/>
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Flat No 404, Skyline Apartments, Vizag - 500576"/>
+            android:text="@string/loading_pickup_address"
+            android:textColor="@color/secondary_text"
+            android:id="@+id/id_Text_Bottom_Pickup_Address"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_margin"
+            android:text="@string/destination_address"
+            android:textColor="@color/primary_text"
+            android:textStyle="bold"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/loading_destination_address"
+            android:textColor="@color/secondary_text"
+            android:id="@+id/id_Text_Bottom_Destination_Address"/>
 
     <Button
             android:id="@+id/id_But_Place_Pickup"

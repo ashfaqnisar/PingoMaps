@@ -145,11 +145,11 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         mDestinationAddressText.isSelected = true
         mDestinationAddressText.setSingleLine(true)
 
-        mPickupCardView = view.findViewById(R.id.id_cardview_pickup)
-        mDestinationCardView = view.findViewById(R.id.id_cardview_destination)
+        mPickupCardView = view.findViewById(R.id.id_Cardview_Pickup)
+        mDestinationCardView = view.findViewById(R.id.id_Cardview_Destination)
 
         mBottomSheetView = view.findViewById(R.id.id_Include_Bottom_Sheet)
-        mPlaceTheRideButton = mBottomSheetView.findViewById(R.id.id_But_Place_Pickup) as Button
+        mPlaceTheRideButton = view.findViewById(R.id.id_But_PlaceThePickup) as Button
 
         mGetMyLocationButton = view.findViewById(R.id.id_Float_But_GetMyLocation)
 

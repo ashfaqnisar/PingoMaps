@@ -17,6 +17,7 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/list_item_spacing_half"
             android:elevation="8dp"
+            android:clickable="true"
             android:foreground="?attr/selectableItemBackground">
         <TextView
                 android:layout_width="wrap_content"
@@ -32,6 +33,7 @@
             android:padding="15dp"
             android:layout_marginHorizontal="@dimen/list_item_spacing_half"
             android:elevation="5dp"
+            android:clickable="true"
             android:foreground="?attr/selectableItemBackground">
         <TextView
                 android:layout_width="wrap_content"
@@ -48,6 +50,7 @@
             android:padding="15dp"
             android:layout_marginHorizontal="@dimen/list_item_spacing_half"
             android:elevation="5dp"
+            android:clickable="true"
             android:foreground="?attr/selectableItemBackground">
         <TextView
                 android:layout_width="wrap_content"

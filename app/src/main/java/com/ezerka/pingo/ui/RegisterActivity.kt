@@ -192,13 +192,12 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        mAuth!!.addAuthStateListener(mAuthListener!!)
         log("onStart(): Init")
     }
 
     override fun onStop() {
         super.onStop()
-        mAuth!!.removeAuthStateListener { mAuthListener!! }
+        mAuth?.removeAuthStateListener { mAuthListener!! }
         log("onStop(): Init")
     }
 

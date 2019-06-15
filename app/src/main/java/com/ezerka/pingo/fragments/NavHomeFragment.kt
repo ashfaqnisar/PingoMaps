@@ -85,7 +85,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     private lateinit var mDestinationCardView: CardView
     private lateinit var mPlaceTheRideButton: Button
     private lateinit var mGetMyLocationButton: FloatingActionButton
-
+    private lateinit var mBottomSheetView: View
     private lateinit var mPolylineDataList: ArrayList<PolylineData>
     private lateinit var mStateListAnimator: StateListAnimator
 
@@ -100,8 +100,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     private lateinit var mMap: GoogleMap
     private lateinit var mCenterLatLng: LatLng
     private lateinit var mPlacesClient: PlacesClient
-    private lateinit var mFields: List<Place.Field>
-    private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var mFields: List<Place.Field>//Output fields
+    private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient//Location Finder
     private lateinit var mLastLocation: Location
     private lateinit var mGoogleApiAvailability: GoogleApiAvailability
 
@@ -148,7 +148,9 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         mPickupCardView = view.findViewById(R.id.id_cardview_pickup)
         mDestinationCardView = view.findViewById(R.id.id_cardview_destination)
 
-        mPlaceTheRideButton = view.findViewById(R.id.id_But_PlaceThePickup)
+        mBottomSheetView = view.findViewById(R.id.id_Include_Bottom_Sheet)
+        mPlaceTheRideButton = mBottomSheetView.findViewById(R.id.id_But_Place_Pickup) as Button
+
         mGetMyLocationButton = view.findViewById(R.id.id_Float_But_GetMyLocation)
 
         mKey = getString(R.string.google_maps_key)
@@ -207,7 +209,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         }
 
         mPlaceTheRideButton.setOnClickListener {
-            startTheActivity(BookingInputsActivity::class.java)
+            startTheActivityNoIntent(BookingInputsActivity::class.java)
 
             /*if (mPickupMarker != null && mDestinationMarker != null) {
                 startTheActivity(BookingInputsActivity::class.java)
@@ -819,6 +821,14 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
+    }
+
+    private fun startTheActivityNoIntent(mClass: Class<*>) {
+        log("startTheActivityNoIntent: ${mClass.simpleName}.class Activity")
+        val intent = Intent(context, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivityNoIntent(): Opened the ${mClass.simpleName}.class Activity")
     }
 
     override fun onResume() {

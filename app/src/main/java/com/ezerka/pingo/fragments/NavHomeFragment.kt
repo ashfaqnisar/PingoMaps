@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -64,7 +63,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import timber.log.Timber
+import com.ezerka.pingo.util.*
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -209,7 +208,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         }
 
         mPlaceTheRideButton.setOnClickListener {
-            startTheActivityNoIntent(BookingInputsActivity::class.java)
+            startTheActivity(BookingInputsActivity::class.java, context)
 
             /*if (mPickupMarker != null && mDestinationMarker != null) {
                 startTheActivity(BookingInputsActivity::class.java)
@@ -285,13 +284,13 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
                     if (reportResult.areAllPermissionsGranted()) {
                         log("requestTheMapPermission(): OnPermissionChecked(): PermissionsGranted: All permissions are granted")
-                        makeToast("All Permissions Are Granted")
+                        makeToast("All Permissions Are Granted",context)
                         mLocationPermissionGranted = true
                     }
 
                     if (reportResult.isAnyPermissionPermanentlyDenied) {
                         logError("requestTheMapPermission(): OnPermissionChecked(): Denied: ${reportResult.deniedPermissionResponses}")
-                        makeToast("Unable to provide all the permissions")
+                        makeToast("Unable to provide all the permissions",context)
                         mLocationPermissionGranted = false
                     }
 
@@ -317,7 +316,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
     private fun placeTheDirections() {
         if (mPickupMarker != null && mDestinationMarker != null) {
-            makeToast("assignTheMethods(): Calculating Directions")
+            makeToast("assignTheMethods(): Calculating Directions",context)
             calculateDirections(mPickupMarker, mDestinationMarker)
 
             val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
@@ -473,7 +472,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             }
             else -> {
                 logError("isGoogleServicesInstalled():User can't make the request")
-                makeToast("isServicesOK():You can't make services request")
+                makeToast("isServicesOK():You can't make services request",context)
             }
         }
         return false
@@ -569,11 +568,11 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         ) {
             mLocationPermissionGranted = false
             logError("getTheUserLocation(): Unable to assign the permissions")
-            makeToast("Please provide the permission to make the  application work")
+            makeToast("Please provide the permission to make the  application work",context)
         }
         if (!isGpsEnabled()) {
             logError("getTheUserLocation():GPS is not enabled")
-            makeToast("Please enable the GPS to find your location")
+            makeToast("Please enable the GPS to find your location",context)
         } else {
             getUserDetails()
             mMap.isMyLocationEnabled = true
@@ -628,7 +627,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
-                    makeToast("Place:" + place.name + place.id)
+                    makeToast("Place:" + place.name + place.id,context)
 
                     val address: String = place.address.toString()
                     mPickupAddressText.text = address
@@ -640,7 +639,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                     if (mPickupMarker != null && mDestinationMarker != null) {
                         removePolylinesPresent()
                     }
-                    makeToast("onActivityResult(): Pickup: Location is" + place.latLng)
+                    makeToast("onActivityResult(): Pickup: Location is" + place.latLng,context)
                     placeTheDirections()
                 }
                 AutocompleteActivity.RESULT_ERROR -> {
@@ -655,7 +654,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
-                    makeToast("Place:" + place.name + place.id)
+                    makeToast("Place:" + place.name + place.id,context)
 
                     val address: String = place.address.toString()
                     mDestinationAddressText.text = address
@@ -675,7 +674,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                 AutocompleteActivity.RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
                     logError(" onActivityResult(): Destination: Status:" + status.statusMessage)
-                    makeToast("Error")
+                    makeToast("Error",context)
                 }
 
                 AppCompatActivity.RESULT_CANCELED -> {
@@ -739,7 +738,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         } catch (error: IOException) {
             error.stackTrace
             logError("getAddressFromLocation():IOException: Error: $error")
-            makeToast("Could Not Get BothAddress $error")
+            makeToast("Could Not Get BothAddress $error",context)
             return "Could Not Get the BothAddress"
         }
     }
@@ -802,34 +801,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         mMap.animateCamera(updateCamera)
     }
 
-    private fun log(log: String) {
-        Timber.d("Log: $log")
-    }
 
-    private fun logError(error: String) {
-        Timber.e("Log Error: $error")
-    }
-
-    private fun makeToast(toast: String) {
-        log("Toast: $toast")
-        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun startTheActivity(mClass: Class<*>) {
-        log("startTheActivity(): ${mClass.simpleName}.class Activity")
-        val intent = Intent(context, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
-    }
-
-    private fun startTheActivityNoIntent(mClass: Class<*>) {
-        log("startTheActivityNoIntent: ${mClass.simpleName}.class Activity")
-        val intent = Intent(context, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        log("startTheActivityNoIntent(): Opened the ${mClass.simpleName}.class Activity")
-    }
 
     override fun onResume() {
         super.onResume()

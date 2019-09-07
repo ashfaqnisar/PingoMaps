@@ -73,4 +73,6 @@
     <string name="Cost_of_ride">₹435.00</string>
     <string name="place_pickup">Place Pickup</string>
     <string name="transport">Transport</string>
+    <string name="finish">Finish</string>
+    <string name="name">Name</string>
 </resources>

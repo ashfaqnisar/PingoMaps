@@ -4,9 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
+import com.ezerka.pingo.util.log
+import com.ezerka.pingo.util.logError
+import com.ezerka.pingo.util.makeToast
+import com.ezerka.pingo.util.startTheActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -18,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import timber.log.Timber
 
 
 class LoginActivity : AppCompatActivity() {
@@ -100,12 +106,12 @@ class LoginActivity : AppCompatActivity() {
 
         mLoginRegisterButton.setOnClickListener {
             log("mLoginRegisterButton: OnClick: Starting The Register Activity")
-            startTheActivity(RegisterActivity::class.java)
+            startTheActivity(RegisterActivity::class.java, mContext)
         }
 
         mSkipLoginText.setOnClickListener {
             log("mSkipLoginText: OnClick: Starting The Permissions Activity")
-            startTheActivity(MainActivity::class.java)
+            startTheActivity(MainActivity::class.java, mContext)
         }
         mGoogleSignInButton.setOnClickListener {
             log("mGoogleSignInButton: OnClick: Logging in the user")
@@ -134,7 +140,7 @@ class LoginActivity : AppCompatActivity() {
             } catch (e: ApiException) {
                 logError("Error: $e")
                 closeLoadingBar("handleSignInResult()")
-                makeToast("Unable to fetch the account")
+                makeToast("Unable to fetch the account", mContext)
             }
         }
     }
@@ -148,11 +154,11 @@ class LoginActivity : AppCompatActivity() {
             if (task.isSuccessful) {
                 closeLoadingBar("firebaseAuthWithGoogle()")
                 log("firebaseAuthWithGoogle():signWithCredential(): User is successfully stored")
-                makeToast("User is successfully signed in!! ")
-                startTheActivity(MainActivity::class.java)
+                makeToast("User is successfully signed in!! ", mContext)
+                startTheActivity(StoreUserDetails::class.java, mContext)
             } else {
                 closeLoadingBar("firebaseAuthWithGoogle()")
-                makeToast("Unable to sign in the user, Please try again")
+                makeToast("Unable to sign in the user, Please try again", mContext)
                 logError("firebaseAuthWithGoogle(): Error: " + task.exception)
             }
         }
@@ -169,12 +175,15 @@ class LoginActivity : AppCompatActivity() {
                 if (Task.isSuccessful) {
                     closeLoadingBar("loginTheUser: signInWithEmailAndPassword(): Successful")
                     log("Successfully Logged In with user: " + mAuth!!.uid)
-                    makeToast("Signed In  Successfully ")
+                    makeToast("Signed In  Successfully ", mContext)
 
-                    startTheActivity(MainActivity::class.java)
+                    startTheActivity(MainActivity::class.java, mContext)
                 } else {
                     closeLoadingBar("loginTheUser: signInWithEmailAndPassword(): Failure Listener")
-                    makeToast("Unable to Sign in, Please Try Again " + Task.exception.toString())
+                    makeToast(
+                        "Unable to Sign in, Please Try Again " + Task.exception.toString(),
+                        mContext
+                    )
                     logError("Error: " + Task.exception.toString())
                 }
             }
@@ -201,28 +210,12 @@ class LoginActivity : AppCompatActivity() {
     private fun checkForAlreadySignedInUser() {
         if (mUser != null) {
             log("checkForAlreadySignedInUser():User is logged in with Id: ${mUser!!.uid}, ${mUser!!.displayName}")
-            makeToast("User Has Been Already Logged In")
-            startTheActivity(MainActivity::class.java)
+            makeToast("User Has Been Already Logged In", mContext)
+            startTheActivity(MainActivity::class.java, mContext)
         }
 
     }
 
-    private fun log(log: String) {
-        Timber.d("Log: $log")
-    }
-
-    private fun logError(error: String) {
-        Timber.e("Log Error: $error")
-    }
-
-    private fun startTheActivity(mClass: Class<*>) {
-        log("startTheActivity(): Starting the ${mClass.simpleName}.class Activity")
-        val intent = Intent(mContext, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
-        finish()
-    }
 
     private fun showLoadingBar(method: String) {
         log("showLoadingBar(): $method")
@@ -234,10 +227,6 @@ class LoginActivity : AppCompatActivity() {
         mLoginProgressBar.visibility = View.GONE
     }
 
-    private fun makeToast(toast: String) {
-        log("Toast: $toast")
-        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
-    }
 
     override fun onStart() {
         super.onStart()

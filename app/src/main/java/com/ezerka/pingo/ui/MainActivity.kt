@@ -31,6 +31,7 @@ import com.bumptech.glide.request.target.Target
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.*
 import com.ezerka.pingo.models.UserData
+import com.ezerka.pingo.util.*
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -170,11 +171,11 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item!!.itemId) {
             R.id.action_settings -> {
-                makeToast("Clicked Settings")
+                makeToast("Clicked Settings",mContext)
                 true
             }
             R.id.action_list -> {
-                makeToast("Clicked List")
+                makeToast("Clicked List",mContext)
                 true
             }
             else -> {
@@ -392,30 +393,11 @@ class MainActivity : AppCompatActivity(),
         log("logoutTheUser():User Logged out Successfully")
         mAuth!!.signOut()
         log("logoutTheUser():Starting the LoginActivity")
-        startTheActivity(LoginActivity::class.java)
+        startTheActivity(LoginActivity::class.java,mContext)
     }
 
 
-    private fun log(log: String) {
-        Timber.d("Log: $log")
-    }
 
-    private fun logError(error: String) {
-        Timber.e("Log Error: $error")
-    }
-
-    private fun makeToast(toast: String) {
-        log("Toast: $toast")
-        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun startTheActivity(mClass: Class<*>) {
-        log("startTheActivity(): ${mClass.simpleName}.class Activity")
-        val intent = Intent(mContext, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
-    }
 
     override fun onResume() {
         super.onResume()

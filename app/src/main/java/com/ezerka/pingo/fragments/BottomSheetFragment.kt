@@ -1,16 +1,14 @@
 package com.ezerka.pingo.fragments
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.ezerka.pingo.util.*
 import com.ezerka.pingo.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import timber.log.Timber
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -38,7 +36,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         if (context is OnFragmentInteractionListener) {
             listener = context
             log("onAttach():Fragment is attached")
-            makeToast("Fragment is attached")
+            makeToast("Fragment is attached",context)
         } else {
             throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
@@ -64,24 +62,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
      */
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(uri: Uri)
-    }
-
-    private fun log(log: String) {
-        Timber.d("Log: $log")
-    }
-
-    private fun logError(error: String) {
-        Timber.e("Log Error: $error")
-    }
-
-    private fun makeToast(toast: String) {
-        log("Making a toast of $toast")
-        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun startTheActivity(mClass: Class<*>) {
-        val intent = Intent(context, mClass)
-        startActivity(intent)
     }
 
 }

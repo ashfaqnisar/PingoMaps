@@ -1,21 +1,20 @@
 package com.ezerka.pingo.ui
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.Toast
+import com.ezerka.pingo.util.*
 import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.BottomSheetFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import timber.log.Timber
 
-class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmentInteractionListener {
 
+class BookingInputsActivity : AppCompatActivity(),
+    BottomSheetFragment.OnFragmentInteractionListener {
 
     private lateinit var mContext: Context
 
@@ -46,7 +45,8 @@ class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmen
         mBottomLinearLayout = findViewById(R.id.id_Layout_bottom_sheet)
 
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomLinearLayout)
-        mBottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        mBottomSheetBehavior.setBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
             }
@@ -54,20 +54,20 @@ class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmen
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_COLLAPSED -> {
-                        makeToast("State Collapsed")
+                        makeToast("State Collapsed", mContext)
                     }
                     BottomSheetBehavior.STATE_HIDDEN -> {
 
                     }
                     BottomSheetBehavior.STATE_EXPANDED -> {
-                        makeToast("Slide Up = State Expanded")
+                        makeToast("Slide Up = State Expanded", mContext)
                     }
                     BottomSheetBehavior.STATE_DRAGGING -> {
 
                     }
                     BottomSheetBehavior.STATE_SETTLING -> {
                     }
-                    BottomSheetBehavior.STATE_HALF_EXPANDED ->{
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
 
                     }
                 }
@@ -100,25 +100,4 @@ class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmen
         }
     }
 
-    private fun log(log: String) {
-        Timber.d("Log: $log")
-
-    }
-
-    private fun logError(error: String) {
-        Timber.e("Log Error: $error")
-    }
-
-    private fun makeToast(toast: String) {
-        log("Toast: $toast")
-        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun startTheActivity(mClass: Class<*>) {
-        log("startTheActivity(): ${mClass.simpleName}.class Activity")
-        val intent = Intent(mContext, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
-    }
 }

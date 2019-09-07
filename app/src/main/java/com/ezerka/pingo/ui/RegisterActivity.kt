@@ -8,6 +8,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.models.UserData
+import com.ezerka.pingo.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -73,7 +74,7 @@ class RegisterActivity : AppCompatActivity() {
 
         mBackToLoginText.setOnClickListener {
             log("assignTheLinks():mBackToLoginText: Starting the LoginActivity")
-            startTheActivity(LoginActivity::class.java)
+            startTheActivity(LoginActivity::class.java,mContext)
         }
     }
 
@@ -92,11 +93,11 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     log("registerTheUser: Task Successful: User Registered: ${mAuth!!.uid}")
                     storeTheDataOnDB()
-                    makeToast("Registered  Successfully ")
+                    makeToast("Registered  Successfully ",mContext)
                 } else {
                     closeLoadingBar("registerTheUser: Failure Listener")
                     logError("registerTheUser(): Task Unsuccessful: ${task.exception}")
-                    makeToast("Unable to Register the user, Please Try Again.")
+                    makeToast("Unable to Register the user, Please Try Again.",mContext)
                 }
             }
 
@@ -127,14 +128,14 @@ class RegisterActivity : AppCompatActivity() {
             if (task.isSuccessful) {
                 closeLoadingBar("storeTheDataOnDB()")
                 log("storeTheDataOnDB():Task Success(): Data has been successfully stored ")
-                makeToast("Data Stored Successfully")
+                makeToast("Data Stored Successfully",mContext)
                 mAuth!!.signOut()
                 log("registerTheUser: Signing out the user.")
-                startTheActivity(LoginActivity::class.java)
+                startTheActivity(LoginActivity::class.java,mContext)
 
             } else {
                 logError("storeTheDataOnDB():Task Failed: Unable to store the data " + task.exception)
-                makeToast("Error: " + task.exception.toString())
+                makeToast("Error: " + task.exception.toString(),mContext)
             }
         }
 
@@ -159,22 +160,6 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
 
-    private fun log(log: String) {
-        Timber.d("Log: $log")
-    }
-
-    private fun logError(error: String) {
-        Timber.e("Log Error: $error")
-    }
-
-    private fun startTheActivity(mClass: Class<*>) {
-        log("startTheActivity(): Starting the ${mClass.simpleName}.class Activity")
-        val intent = Intent(mContext, mClass)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
-        finish()
-    }
 
     private fun showLoadingBar(method: String) {
         log("showLoadingBar(): $method")
@@ -184,11 +169,6 @@ class RegisterActivity : AppCompatActivity() {
     private fun closeLoadingBar(method: String) {
         log("closeLoadingBar(): $method")
         mRegisterProgressBar.visibility = View.GONE
-    }
-
-    private fun makeToast(toast: String) {
-        log("Toast: $toast")
-        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
     }
 
     override fun onStart() {

@@ -3,9 +3,9 @@ package com.ezerka.pingo.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.models.UserData
 import com.google.firebase.auth.FirebaseAuth
@@ -141,6 +141,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun checkForErrors(Email: String, Pass: String, Mobile: String): Boolean {
+        closeLoadingBar("checkForErrors()")
         if (Email.isEmpty()) {
             mEmailRegisterET.error = "Please Enter The Email Id"
             return false

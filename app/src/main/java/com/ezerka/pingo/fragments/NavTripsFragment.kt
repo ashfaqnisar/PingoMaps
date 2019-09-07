@@ -4,16 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.design.widget.TabLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.viewpager.widget.ViewPager
 import com.ezerka.pingo.R
 import com.ezerka.pingo.adapters.TripsViewPagerAdapter
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.tabs.TabLayout
 import timber.log.Timber
 
 class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFragmentInteractionListener,

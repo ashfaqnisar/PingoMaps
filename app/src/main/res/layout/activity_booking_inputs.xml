@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,7 +27,7 @@
             layout="@layout/comp_bottom_sheet"
             android:id="@+id/id_Layout_bottom_sheet"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
         <!--
         <android.support.design.widget.CoordinatorLayout
                 android:id="@+id/coordinator_layout"

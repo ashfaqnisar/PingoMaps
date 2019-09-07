@@ -1,19 +1,21 @@
 package com.ezerka.pingo.adapters
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
+
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import com.ezerka.pingo.fragments.TripsHistoryFragment
 import com.ezerka.pingo.fragments.TripsUpcomingFragment
 
-class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int) : FragmentStatePagerAdapter(manager) {
+class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int) : FragmentPagerAdapter(manager) {
+
 
     override fun getCount(): Int {
         return tabCount
     }
 
     override fun getItem(position: Int): Fragment {
-        return when (position) {
+         return when (position) {
             0 -> {
                 TripsHistoryFragment()
             }

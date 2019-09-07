@@ -12,59 +12,62 @@ android {
     defaultConfig {
         applicationId "com.ezerka.pingo"
         minSdkVersion 26
-        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.31"
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.50'
+    implementation 'com.google.android.material:material:1.0.0'
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:cardview-v7:28.0.0'
-    implementation 'com.android.support:support-annotations:28.0.0'
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
+    implementation 'androidx.activity:activity:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.fragment:fragment:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'//Maps Dependency
-    implementation 'com.google.android.libraries.places:places:1.1.0'//Places Dependency
-    implementation 'com.google.android.gms:play-services-location:16.0.0' //Location Dependency
-    implementation 'com.google.maps:google-maps-services:0.2.11' //Directions Dependency
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'//Maps Dependency
+    implementation 'com.google.android.libraries.places:places:2.0.0'//Places Dependency
+    implementation 'com.google.android.gms:play-services-location:17.0.0' //Location Dependency
+    implementation 'com.google.maps:google-maps-services:0.9.4' //Directions Dependency
     implementation 'com.google.maps.android:android-maps-utils:0.5' //Custom Markers Dependency
-    implementation 'org.slf4j:slf4j-nop:1.7.25'
+    implementation 'org.slf4j:slf4j-nop:1.7.28'
 
-    implementation "com.karumi:dexter:4.2.0"//Dexter Runtime Permissions
+    implementation 'com.karumi:dexter:5.0.0'//Dexter Runtime Permissions
 
     implementation 'com.jakewharton.timber:timber:4.7.1'//Timber Logging Library
 
-    implementation 'com.github.bumptech.glide:glide:4.8.0' //Glide Image Library
-    kapt 'com.github.bumptech.glide:compiler:4.8.0'//Kotlin Glide Compiler
+    implementation 'com.github.bumptech.glide:glide:4.9.0' //Glide Image Library
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'//Kotlin Glide Compiler
 
 
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'//Google Authentication Dependency
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'//Google Authentication Dependency
 
-    implementation 'com.google.firebase:firebase-database:17.0.0'//Firebase Realtime Database
-    implementation 'com.google.firebase:firebase-core:16.0.9' //Firebase Integration Dependency
-    implementation 'com.google.firebase:firebase-auth:17.0.0' //Firebase Authentication Dependency
-    implementation 'com.google.firebase:firebase-firestore:19.0.0' //Firebase FireStore Dependency
-    implementation 'com.google.firebase:firebase-messaging:18.0.0' //Firebase Messaging Dependency
-    implementation 'com.google.firebase:firebase-storage:17.0.0' //Firebase Storage Dependency
+    implementation 'com.google.firebase:firebase-database:19.0.0'//Firebase Realtime Database
+    implementation 'com.google.firebase:firebase-core:17.2.0' //Firebase Integration Dependency
+    implementation 'com.google.firebase:firebase-auth:19.0.0' //Firebase Authentication Dependency
+    implementation 'com.google.firebase:firebase-firestore:21.0.0' //Firebase FireStore Dependency
+    implementation 'com.google.firebase:firebase-messaging:20.0.0' //Firebase Messaging Dependency
+    implementation 'com.google.firebase:firebase-storage:19.0.0' //Firebase Storage Dependency
 
 }
 apply plugin: 'com.google.gms.google-services'

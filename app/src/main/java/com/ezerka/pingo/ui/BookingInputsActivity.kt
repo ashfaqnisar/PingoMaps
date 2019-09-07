@@ -4,14 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.BottomSheetFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import timber.log.Timber
 
 class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmentInteractionListener {
@@ -66,6 +66,8 @@ class BookingInputsActivity : AppCompatActivity(), BottomSheetFragment.OnFragmen
 
                     }
                     BottomSheetBehavior.STATE_SETTLING -> {
+                    }
+                    BottomSheetBehavior.STATE_HALF_EXPANDED ->{
 
                     }
                 }

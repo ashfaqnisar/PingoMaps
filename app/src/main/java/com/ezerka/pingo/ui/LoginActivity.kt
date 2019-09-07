@@ -3,9 +3,9 @@ package com.ezerka.pingo.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -241,13 +241,13 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        mAuth!!.addAuthStateListener { mAuthListener }
+        mAuth?.addAuthStateListener { mAuthListener }
         checkForAlreadySignedInUser()
     }
 
     override fun onStop() {
         super.onStop()
-        mAuth!!.removeAuthStateListener { mAuthListener }
+        mAuth?.removeAuthStateListener { mAuthListener }
     }
 
 }

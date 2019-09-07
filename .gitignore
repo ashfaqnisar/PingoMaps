@@ -11,3 +11,11 @@
 /build
 /captures
 .externalNativeBuild
+
+app/src/release/res/values/google_maps_api.xml
+
+app/src/androidTest/java/com/ezerka/pingo/ExampleInstrumentedTest.kt
+
+app/src/test/java/com/ezerka/pingo/ExampleUnitTest.kt
+
+.idea/

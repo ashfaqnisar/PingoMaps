@@ -29,9 +29,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import com.ezerka.pingo.R
+import com.ezerka.pingo.models.AddressData
 import com.ezerka.pingo.models.PolylineData
+import com.ezerka.pingo.models.SingletonObject.addressDataSingleton
 import com.ezerka.pingo.models.SingletonObject.userSingleton
-import com.ezerka.pingo.models.UserData
 import com.ezerka.pingo.models.UserLocationData
 import com.ezerka.pingo.ui.BookingInputsActivity
 import com.ezerka.pingo.util.Constants
@@ -77,6 +78,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     private val mDestinationRequestCode: Int = 2
     private var mLocationPermissionGranted: Boolean = false
     private lateinit var mKey: String
+    private lateinit var mAddressData: AddressData
 
 
     private lateinit var mPickupAddressText: TextView
@@ -193,6 +195,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             }
         }
         mDatabase = FirebaseFirestore.getInstance()
+
+        mAddressData = AddressData()
     }
 
     private fun assignTheLinks() {
@@ -330,11 +334,10 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
             val mPickupMarkerLatLng =
                 LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
-            val mDestinationMarkerLatLng =
-                LatLng(
-                    mDestinationMarker!!.position.latitude,
-                    mDestinationMarker!!.position.longitude
-                )
+            val mDestinationMarkerLatLng = LatLng(
+                mDestinationMarker!!.position.latitude,
+                mDestinationMarker!!.position.longitude
+            )
 
             adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
         }
@@ -386,9 +389,14 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             log("addPolyLinesToTheMap(): Run: Result Routes: ${result.routes}")
 
             removeThePreviousPolylines()
-            log("Routes: ${result.routes[0].legs[0].distance}")
 
             val route: DirectionsRoute = findTheShortestRoute(result.routes)
+            mAddressData.distance = route.legs[0].distance
+            mAddressData.duration = route.legs[0].duration
+
+            addressDataSingleton = mAddressData
+
+            log("Object: $addressDataSingleton♠")
 
             log("addPolyLinesToTheMap(): The route is $route")
 
@@ -407,7 +415,6 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             polyline.color = getColor(context!!, R.color.colorPrimary)
             polyline.isClickable = true
             mPolylineDataList.add(PolylineData(polyline, route.legs[0]))
-
         }
     }
 
@@ -557,8 +564,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                 polylineData.polyline.color = getColor(context!!, R.color.colorAccent)
                 polylineData.polyline.zIndex = 1F
 
-                val polylineLatLng =
-                    LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng)
+                val polylineLatLng = LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng)
 
                 placeMarkerWithData(
                     polylineLatLng,
@@ -566,6 +572,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                     polylineData.leg.duration,
                     polylineData.leg.distance
                 )
+
             } else {
                 polylineData.polyline.color = getColor(context!!, R.color.colorPrimary)
                 polylineData.polyline.zIndex = 0F
@@ -665,9 +672,9 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
                     makeToast("Place:" + place.name + place.id)
 
-                    val address: String = place.address.toString()
-                    mPickupAddressText.text = address
-
+                    mPickupAddressText.text = place.address.toString()
+                    mAddressData.pickupAddress = mPickupAddressText.text as String
+                    mAddressData.pickuplatlng  = place.latLng
 
                     updateTheCamera(place.latLng, 12F)
                     placePickupMarker(place.latLng)
@@ -692,9 +699,10 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
                     makeToast("Place:" + place.name + place.id)
 
-                    val address: String = place.address.toString()
-                    mDestinationAddressText.text = address
+                    mDestinationAddressText.text = place.address.toString()
 
+                    mAddressData.destAddress = mDestinationAddressText.text as String
+                    mAddressData.destLatLng = place.latLng
 
                     updateTheCamera(place.latLng, 12F)
                     placeDestinationMarker(place.latLng)

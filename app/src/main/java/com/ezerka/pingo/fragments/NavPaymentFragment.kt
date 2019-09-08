@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.ezerka.pingo.R
-import com.ezerka.pingo.util.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import timber.log.Timber
 
@@ -52,7 +51,7 @@ class NavPaymentFragment : BottomSheetDialogFragment() {
         if (context is OnFragmentInteractionListener) {
             listener = context
             log("onAttach():Fragment is attached")
-            makeToast("Fragment is attached",context)
+            makeToast("Fragment is attached")
         } else {
             //throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
@@ -68,6 +67,26 @@ class NavPaymentFragment : BottomSheetDialogFragment() {
 
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(uri: Uri)
+    }
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
+
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(context, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
     }
 
 

@@ -11,11 +11,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.ezerka.pingo.R
 import com.ezerka.pingo.adapters.TripsHistoryRecyclerAdapter
 import com.ezerka.pingo.models.AddressData
-import com.ezerka.pingo.util.*
 import timber.log.Timber
 
 
@@ -85,5 +83,25 @@ class TripsHistoryFragment : Fragment() {
 
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(uri: Uri)
+    }
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
+
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(context, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
     }
 }

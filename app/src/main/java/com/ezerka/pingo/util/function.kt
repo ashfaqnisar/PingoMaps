@@ -27,7 +27,7 @@ fun startTheActivity(mClass: Class<*>, context: Context?) {
     log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
 }
 
-private fun startTheActivitywithClearFlag(mClass: Class<*>,context: Context) {
+private fun startTheActivitywithClearFlag(mClass: Class<*>, context: Context) {
     log("startTheActivity(): ${mClass.simpleName}.class Activity")
     val intent = Intent(context, mClass)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -35,7 +35,7 @@ private fun startTheActivitywithClearFlag(mClass: Class<*>,context: Context) {
     log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
 }
 
-fun startTheActivity(mClass: Class<*>,context: Context,withIntent:Boolean) {
+fun startTheActivity(mClass: Class<*>, context: Context, withIntent: Boolean) {
     log("startTheActivity(): ${mClass.simpleName}.class Activity")
     val intent = Intent(context, mClass)
     context.startActivity(intent)

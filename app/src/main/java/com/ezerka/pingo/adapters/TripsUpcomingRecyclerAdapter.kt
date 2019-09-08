@@ -33,8 +33,10 @@ class TripsUpcomingRecyclerAdapter
     class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
 
         fun bindItems(addresses: AddressData) {
-            val mTripsPickupAddress = itemView.findViewById<TextView?>(R.id.id_Text_Trips_Pickup_Address)
-            val mTripsDestAddress = itemView.findViewById<TextView?>(R.id.id_Text_Trips_Dest_Address)
+            val mTripsPickupAddress =
+                itemView.findViewById<TextView?>(R.id.id_Text_Trips_Pickup_Address)
+            val mTripsDestAddress =
+                itemView.findViewById<TextView?>(R.id.id_Text_Trips_Dest_Address)
 
             mTripsPickupAddress!!.text = addresses.pickupAddress
             mTripsDestAddress!!.text = addresses.destAddress

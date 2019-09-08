@@ -10,7 +10,10 @@ import com.ezerka.pingo.R
 import com.ezerka.pingo.models.AddressData
 
 
-class TripsHistoryRecyclerAdapter(val context: Context, private val mAddressList: ArrayList<AddressData>) :
+class TripsHistoryRecyclerAdapter(
+    val context: Context,
+    private val mAddressList: ArrayList<AddressData>
+) :
     RecyclerView.Adapter<TripsHistoryRecyclerAdapter.ViewHolder>() {
 
     private var layoutInflater: LayoutInflater = LayoutInflater.from(context)
@@ -32,8 +35,10 @@ class TripsHistoryRecyclerAdapter(val context: Context, private val mAddressList
     class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
 
         fun bindItems(addresses: AddressData) {
-            val mTripsPickupAddress = itemView.findViewById<TextView?>(R.id.id_Text_Trips_Pickup_Address)
-            val mTripsDestAddress = itemView.findViewById<TextView?>(R.id.id_Text_Trips_Dest_Address)
+            val mTripsPickupAddress =
+                itemView.findViewById<TextView?>(R.id.id_Text_Trips_Pickup_Address)
+            val mTripsDestAddress =
+                itemView.findViewById<TextView?>(R.id.id_Text_Trips_Dest_Address)
 
             mTripsPickupAddress!!.text = addresses.pickupAddress
             mTripsDestAddress!!.text = addresses.destAddress

@@ -7,7 +7,8 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.ezerka.pingo.fragments.TripsHistoryFragment
 import com.ezerka.pingo.fragments.TripsUpcomingFragment
 
-class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int) : FragmentPagerAdapter(manager) {
+class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int) :
+    FragmentPagerAdapter(manager) {
 
 
     override fun getCount(): Int {
@@ -15,7 +16,7 @@ class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int)
     }
 
     override fun getItem(position: Int): Fragment {
-         return when (position) {
+        return when (position) {
             0 -> {
                 TripsHistoryFragment()
             }

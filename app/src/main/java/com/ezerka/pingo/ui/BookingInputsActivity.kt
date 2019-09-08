@@ -1,16 +1,18 @@
 package com.ezerka.pingo.ui
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
-import com.ezerka.pingo.util.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.BottomSheetFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import timber.log.Timber
 
 
 class BookingInputsActivity : AppCompatActivity(),
@@ -54,13 +56,13 @@ class BookingInputsActivity : AppCompatActivity(),
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_COLLAPSED -> {
-                        makeToast("State Collapsed", mContext)
+                        makeToast("State Collapsed")
                     }
                     BottomSheetBehavior.STATE_HIDDEN -> {
 
                     }
                     BottomSheetBehavior.STATE_EXPANDED -> {
-                        makeToast("Slide Up = State Expanded", mContext)
+                        makeToast("Slide Up = State Expanded")
                     }
                     BottomSheetBehavior.STATE_DRAGGING -> {
 
@@ -88,6 +90,26 @@ class BookingInputsActivity : AppCompatActivity(),
         }
 
 
+    }
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
+
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(mContext, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
     }
 
     private fun changeTheBottomState() {

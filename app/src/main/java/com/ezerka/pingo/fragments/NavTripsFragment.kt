@@ -12,12 +12,12 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.ezerka.pingo.R
 import com.ezerka.pingo.adapters.TripsViewPagerAdapter
-import com.ezerka.pingo.util.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import timber.log.Timber
 
-class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFragmentInteractionListener,
+class NavTripsFragment : BottomSheetDialogFragment(),
+    TripsHistoryFragment.OnFragmentInteractionListener,
     TripsUpcomingFragment.OnFragmentInteractionListener {
 
 
@@ -100,7 +100,7 @@ class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFra
         if (context is OnFragmentInteractionListener) {
             listener = context
             log("onAttach():Fragment is attached")
-            makeToast("Fragment is attached",context)
+            makeToast("Fragment is attached")
         } else {
             //throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
@@ -118,6 +118,26 @@ class NavTripsFragment : BottomSheetDialogFragment(), TripsHistoryFragment.OnFra
         fun onFragmentInteraction(uri: Uri)
     }
 
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
+
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(context, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
+    }
 
     override fun onResume() {
         super.onResume()

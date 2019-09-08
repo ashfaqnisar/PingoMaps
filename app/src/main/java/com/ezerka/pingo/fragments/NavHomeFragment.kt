@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -32,7 +33,6 @@ import com.ezerka.pingo.models.PolylineData
 import com.ezerka.pingo.models.UserData
 import com.ezerka.pingo.models.UserLocationData
 import com.ezerka.pingo.ui.BookingInputsActivity
-import com.ezerka.pingo.util.Constants
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.Status
@@ -63,7 +63,8 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.ezerka.pingo.util.*
+import com.ezerka.pingo.util.Constants
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -154,7 +155,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
         mKey = getString(R.string.google_maps_key)
 
-        mStateListAnimator = AnimatorInflater.loadStateListAnimator(context, R.animator.lift_on_touch)
+        mStateListAnimator =
+            AnimatorInflater.loadStateListAnimator(context, R.animator.lift_on_touch)
 
         if (!Places.isInitialized()) {
             Places.initialize(context!!, mKey)
@@ -163,7 +165,12 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         mMapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mMapFragment.getMapAsync(this)
         mPlacesClient = Places.createClient(context!!)
-        mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG)
+        mFields = Arrays.asList(
+            Place.Field.ID,
+            Place.Field.NAME,
+            Place.Field.ADDRESS,
+            Place.Field.LAT_LNG
+        )
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context!!)
 
@@ -208,7 +215,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         }
 
         mPlaceTheRideButton.setOnClickListener {
-            startTheActivity(BookingInputsActivity::class.java, context)
+            startTheActivity(BookingInputsActivity::class.java)
 
             /*if (mPickupMarker != null && mDestinationMarker != null) {
                 startTheActivity(BookingInputsActivity::class.java)
@@ -284,13 +291,13 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
                     if (reportResult.areAllPermissionsGranted()) {
                         log("requestTheMapPermission(): OnPermissionChecked(): PermissionsGranted: All permissions are granted")
-                        makeToast("All Permissions Are Granted",context)
+                        makeToast("All Permissions Are Granted")
                         mLocationPermissionGranted = true
                     }
 
                     if (reportResult.isAnyPermissionPermanentlyDenied) {
                         logError("requestTheMapPermission(): OnPermissionChecked(): Denied: ${reportResult.deniedPermissionResponses}")
-                        makeToast("Unable to provide all the permissions",context)
+                        makeToast("Unable to provide all the permissions")
                         mLocationPermissionGranted = false
                     }
 
@@ -316,12 +323,16 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
     private fun placeTheDirections() {
         if (mPickupMarker != null && mDestinationMarker != null) {
-            makeToast("assignTheMethods(): Calculating Directions",context)
+            makeToast("assignTheMethods(): Calculating Directions")
             calculateDirections(mPickupMarker, mDestinationMarker)
 
-            val mPickupMarkerLatLng = LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
+            val mPickupMarkerLatLng =
+                LatLng(mPickupMarker!!.position.latitude, mPickupMarker!!.position.longitude)
             val mDestinationMarkerLatLng =
-                LatLng(mDestinationMarker!!.position.latitude, mDestinationMarker!!.position.longitude)
+                LatLng(
+                    mDestinationMarker!!.position.latitude,
+                    mDestinationMarker!!.position.longitude
+                )
 
             adjustTheCameraToBounds(mPickupMarkerLatLng, mDestinationMarkerLatLng)
         }
@@ -331,9 +342,15 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         log("calculateDirections():Calculating the directions")
 
         val pickupLatLng =
-            com.google.maps.model.LatLng(pickup_marker!!.position.latitude, pickup_marker.position.longitude)
+            com.google.maps.model.LatLng(
+                pickup_marker!!.position.latitude,
+                pickup_marker.position.longitude
+            )
         val destinationLatLng =
-            com.google.maps.model.LatLng(destination_marker!!.position.latitude, destination_marker.position.longitude)
+            com.google.maps.model.LatLng(
+                destination_marker!!.position.latitude,
+                destination_marker.position.longitude
+            )
 
         val directions = DirectionsApiRequest(mGeoApiContext)
 
@@ -441,7 +458,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
         val padding: Int = (width * 0.20).toInt()
 
-        val cameraUpdate: CameraUpdate = (CameraUpdateFactory.newLatLngBounds(latlngBounds, width, height, padding))
+        val cameraUpdate: CameraUpdate =
+            (CameraUpdateFactory.newLatLngBounds(latlngBounds, width, height, padding))
         mMap.animateCamera(cameraUpdate)
     }
 
@@ -467,19 +485,24 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             mGoogleApiAvailability.isUserResolvableError(available) -> {
                 log("isServicesOK(): Error can be solved by the user")
 
-                val dialog: Dialog = mGoogleApiAvailability.getErrorDialog(activity, available, Constants.ERROR_REQUEST)
+                val dialog: Dialog = mGoogleApiAvailability.getErrorDialog(
+                    activity,
+                    available,
+                    Constants.ERROR_REQUEST
+                )
                 dialog.show()
             }
             else -> {
                 logError("isGoogleServicesInstalled():User can't make the request")
-                makeToast("isServicesOK():You can't make services request",context)
+                makeToast("isServicesOK():You can't make services request")
             }
         }
         return false
     }
 
     private fun isGpsEnabled(): Boolean {
-        val manager: LocationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val manager: LocationManager =
+            activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             logError("isGpsEnabled():GPS is not active")
@@ -502,7 +525,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             }
             .setPositiveButton("Yes") { _, _ ->
                 //Here dialog and the marker are present
-                val openSettingsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                val openSettingsIntent =
+                    Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivityForResult(openSettingsIntent, Constants.PERMISSIONS_ENABLE_GPS_REQUEST)
             }
 
@@ -513,8 +537,10 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         }
 
         alertDialog.setOnShowListener {
-            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(context!!, R.color.colorPrimary))
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context!!, R.color.colorPrimary))
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextColor(getColor(context!!, R.color.colorPrimary))
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(getColor(context!!, R.color.colorPrimary))
 
         }
         alertDialog.show()
@@ -529,9 +555,15 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                 polylineData.polyline.color = getColor(context!!, R.color.colorAccent)
                 polylineData.polyline.zIndex = 1F
 
-                val polylineLatLng = LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng)
+                val polylineLatLng =
+                    LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng)
 
-                placeMarkerWithData(polylineLatLng, index + 1, polylineData.leg.duration, polylineData.leg.distance)
+                placeMarkerWithData(
+                    polylineLatLng,
+                    index + 1,
+                    polylineData.leg.duration,
+                    polylineData.leg.distance
+                )
             } else {
                 polylineData.polyline.color = getColor(context!!, R.color.colorPrimary)
                 polylineData.polyline.zIndex = 0F
@@ -543,15 +575,21 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         if (mUserLocation == null) {
             mUserLocation = UserLocationData()
 
-            val userRef = mDatabase.collection("Users").document(FirebaseAuth.getInstance().uid!!)
-
-            userRef.get().addOnCompleteListener { task ->
+            mDatabase.collection("Users").document(FirebaseAuth.getInstance().uid!!)
+                .get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     log("getUserDetails():OnComplete:Success")
 
-                    val fetchedUser: UserData = task.result!!.toObject(UserData::class.java) as UserData
-                    log(fetchedUser.toString())
-                    mUserLocation!!.user = fetchedUser
+                    if (task.result != null) {
+                        var fetchedUser: UserData? = task.result!!.toObject(UserData::class.java)
+                        log(fetchedUser.toString())
+                        mUserLocation!!.user = fetchedUser
+                        log("Result(1)")
+                    } else {
+                        log("Result(2)")
+                        makeToast("Unable to fetch the details")
+                    }
+
                 } else {
                     logError("getUserDetails: Error: {$task.exception}")
                 }
@@ -568,11 +606,11 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         ) {
             mLocationPermissionGranted = false
             logError("getTheUserLocation(): Unable to assign the permissions")
-            makeToast("Please provide the permission to make the  application work",context)
+            makeToast("Please provide the permission to make the  application work")
         }
         if (!isGpsEnabled()) {
             logError("getTheUserLocation():GPS is not enabled")
-            makeToast("Please enable the GPS to find your location",context)
+            makeToast("Please enable the GPS to find your location")
         } else {
             getUserDetails()
             mMap.isMyLocationEnabled = true
@@ -612,12 +650,14 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     }
 
     private fun openPickupAutocomplete() {
-        val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(context!!)
+        val intent: Intent =
+            Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(context!!)
         startActivityForResult(intent, mPickupRequestCode)
     }
 
     private fun openDestAutocomplete() {
-        val intent: Intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(context!!)
+        val intent: Intent =
+            Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, mFields).build(context!!)
         startActivityForResult(intent, mDestinationRequestCode)
     }
 
@@ -627,7 +667,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
-                    makeToast("Place:" + place.name + place.id,context)
+                    makeToast("Place:" + place.name + place.id)
 
                     val address: String = place.address.toString()
                     mPickupAddressText.text = address
@@ -639,7 +679,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                     if (mPickupMarker != null && mDestinationMarker != null) {
                         removePolylinesPresent()
                     }
-                    makeToast("onActivityResult(): Pickup: Location is" + place.latLng,context)
+                    makeToast("onActivityResult(): Pickup: Location is" + place.latLng)
                     placeTheDirections()
                 }
                 AutocompleteActivity.RESULT_ERROR -> {
@@ -654,7 +694,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place: Place = Autocomplete.getPlaceFromIntent(data!!)
-                    makeToast("Place:" + place.name + place.id,context)
+                    makeToast("Place:" + place.name + place.id)
 
                     val address: String = place.address.toString()
                     mDestinationAddressText.text = address
@@ -674,7 +714,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                 AutocompleteActivity.RESULT_ERROR -> {
                     val status: Status = Autocomplete.getStatusFromIntent(data!!)
                     logError(" onActivityResult(): Destination: Status:" + status.statusMessage)
-                    makeToast("Error",context)
+                    makeToast("Error")
                 }
 
                 AppCompatActivity.RESULT_CANCELED -> {
@@ -738,7 +778,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         } catch (error: IOException) {
             error.stackTrace
             logError("getAddressFromLocation():IOException: Error: $error")
-            makeToast("Could Not Get BothAddress $error",context)
+            makeToast("Could Not Get BothAddress $error")
             return "Could Not Get the BothAddress"
         }
     }
@@ -776,7 +816,12 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     }
 
 
-    private fun placeMarkerWithData(latLng: LatLng?, index: Int, duration: Duration, distance: Distance) {
+    private fun placeMarkerWithData(
+        latLng: LatLng?,
+        index: Int,
+        duration: Duration,
+        distance: Distance
+    ) {
         var marker: Marker? = null
 
         when {
@@ -801,7 +846,26 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         mMap.animateCamera(updateCamera)
     }
 
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
 
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(context, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
+    }
 
     override fun onResume() {
         super.onResume()
@@ -824,4 +888,5 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             requestTheMapPermission()
         }
     }
+
 }

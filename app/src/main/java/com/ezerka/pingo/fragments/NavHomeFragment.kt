@@ -33,6 +33,7 @@ import com.ezerka.pingo.models.PolylineData
 import com.ezerka.pingo.models.UserData
 import com.ezerka.pingo.models.UserLocationData
 import com.ezerka.pingo.ui.BookingInputsActivity
+import com.ezerka.pingo.util.Constants
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.Status
@@ -50,7 +51,6 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.DirectionsApiRequest
@@ -63,7 +63,6 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.ezerka.pingo.util.Constants
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
@@ -251,6 +250,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
         mMap.setOnPolylineClickListener(this)
         mMap.uiSettings.isZoomControlsEnabled = false
+        mMap.isMyLocationEnabled = true
+
         isCameraIdle()
     }
 
@@ -575,25 +576,18 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         if (mUserLocation == null) {
             mUserLocation = UserLocationData()
 
-            mDatabase.collection("Users").document(FirebaseAuth.getInstance().uid!!)
-                .get().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    log("getUserDetails():OnComplete:Success")
+            mDatabase.collection("Users").document(mUser?.uid.toString()).get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        log("getUserDetails():OnComplete:Success")
+                        mUserLocation?.user = task.result!!.toObject(UserData::class.java)
+                        log("mUserLocation: $mUserLocation")
+                        log("User: ${mUserLocation?.user}")
 
-                    if (task.result != null) {
-                        var fetchedUser: UserData? = task.result!!.toObject(UserData::class.java)
-                        log(fetchedUser.toString())
-                        mUserLocation!!.user = fetchedUser
-                        log("Result(1)")
                     } else {
-                        log("Result(2)")
-                        makeToast("Unable to fetch the details")
+                        logError("getUserDetails: Error: {$task.exception}")
                     }
-
-                } else {
-                    logError("getUserDetails: Error: {$task.exception}")
                 }
-            }
         }
 
     }
@@ -613,7 +607,6 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             makeToast("Please enable the GPS to find your location")
         } else {
             getUserDetails()
-            mMap.isMyLocationEnabled = true
 
             mFusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
@@ -621,8 +614,8 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
                     val currentLatLng = LatLng(location.latitude, location.longitude)
                     val userGeoPoint = GeoPoint(location.latitude, location.longitude)
 
-                    mUserLocation!!.geoPoint = userGeoPoint
-                    mUserLocation!!.timestamp = null
+                    mUserLocation?.geoPoint = userGeoPoint
+                    mUserLocation?.timestamp = null
                     storeTheUserLocation()
 
 
@@ -636,17 +629,17 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
     private fun storeTheUserLocation() {
         log("storeTheUserLocation():init")
 
-        val locationReference: DocumentReference =
-            mDatabase.collection("Users Location").document(mAuth?.uid.toString())
-
-        locationReference.set(mUserLocation!!).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                log("storeTheUserLocation():onComplete:Success: Data Store Successfully")
-                log("Latitude: ${mUserLocation?.geoPoint?.latitude}")
-                log("Longitude: ${mUserLocation?.geoPoint?.longitude}")
-
+        mDatabase.collection("Users_Location").document(mAuth?.currentUser?.uid.toString())
+            .set(mUserLocation!!)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    log("storeTheUserLocation():onComplete:Success: Data Store Successfully")
+                    log("Latitude: ${mUserLocation?.geoPoint?.latitude}")
+                    log("Longitude: ${mUserLocation?.geoPoint?.longitude}")
+                } else {
+                    log("Error: ${task.exception}")
+                }
             }
-        }
     }
 
     private fun openPickupAutocomplete() {
@@ -748,36 +741,36 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             mCenterLatLng = mMap.cameraPosition.target
             log("cameraIdle(): Getting the data from the mCenterLatLng ")
             log("Center Details: " + mCenterLatLng.latitude + "," + mCenterLatLng.longitude)
-            getAddressFromLocation(mCenterLatLng.latitude, mCenterLatLng.longitude)
+            getAddressFromMarker(mCenterLatLng.latitude, mCenterLatLng.longitude)
         }
     }
 
-    private fun getAddressFromLocation(latitude: Double, longitude: Double): String {
+    private fun getAddressFromMarker(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(context, Locale.ENGLISH)
 
         try {
 
             val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)
-            log("getAddressFromLocation():The addresses are $addresses")
+            log("getAddressFromMarker():The addresses are $addresses")
 
             return if (addresses.isNotEmpty()) {
                 val fetchedAddress: Address = addresses[0]
-                log("getAddressFromLocation():The fetched address is $fetchedAddress")
+                log("getAddressFromMarker():The fetched address is $fetchedAddress")
 
                 val strAddress: StringBuilder = StringBuilder()
                 strAddress.append(fetchedAddress.getAddressLine(0)).append(" ")
-                log("getAddressFromLocation(): The address is $strAddress")
+                log("getAddressFromMarker(): The address is $strAddress")
 
                 strAddress.toString()
 
             } else {
-                log("getAddressFromLocation(): searching the current address")
+                log("getAddressFromMarker(): searching the current address")
                 getString(R.string.searching_address)
             }
 
         } catch (error: IOException) {
             error.stackTrace
-            logError("getAddressFromLocation():IOException: Error: $error")
+            logError("getAddressFromMarker():IOException: Error: $error")
             makeToast("Could Not Get BothAddress $error")
             return "Could Not Get the BothAddress"
         }

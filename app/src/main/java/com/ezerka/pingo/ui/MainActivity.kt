@@ -31,7 +31,6 @@ import com.bumptech.glide.request.target.Target
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.*
 import com.ezerka.pingo.models.UserData
-import com.ezerka.pingo.util.*
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -40,7 +39,8 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity(),
     NavigationView.OnNavigationItemSelectedListener, NavHomeFragment.OnFragmentInteractionListener,
-    NavTripsFragment.OnFragmentInteractionListener, TripsHistoryFragment.OnFragmentInteractionListener,
+    NavTripsFragment.OnFragmentInteractionListener,
+    TripsHistoryFragment.OnFragmentInteractionListener,
     TripsUpcomingFragment.OnFragmentInteractionListener {
 
     private var mNavViewItemIndex: Int = 0
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mHandler: Handler
     private lateinit var mActiveFragment: Fragment
     private lateinit var mContext: Context
-    private lateinit var mUserData: UserData
+    private var mUserData: UserData? = UserData()
 
     //Normal Variables
     private lateinit var mThumbnailImageView: ImageView
@@ -99,7 +99,13 @@ class MainActivity : AppCompatActivity(),
         mNavigationView = findViewById(R.id.id_View_NavigationView)
 
         mToggle =
-            ActionBarDrawerToggle(this, mDrawerLayout, mToolBar, R.string.open_the_drawer, R.string.close_the_drawer)
+            ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                mToolBar,
+                R.string.open_the_drawer,
+                R.string.close_the_drawer
+            )
         mDrawerLayout.addDrawerListener(mToggle)
         mToggle.syncState()
 
@@ -171,11 +177,11 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item!!.itemId) {
             R.id.action_settings -> {
-                makeToast("Clicked Settings",mContext)
+                makeToast("Clicked Settings")
                 true
             }
             R.id.action_list -> {
-                makeToast("Clicked List",mContext)
+                makeToast("Clicked List")
                 true
             }
             else -> {
@@ -332,27 +338,24 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun fetchUserData() {
-        val ref = mDatabase.collection("Users").document(FirebaseAuth.getInstance().uid!!)
-        log("fetchUserData():FirebaseAuth.getInstance().toString()")
-        ref.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                log("fetchUserDetails():OnComplete:Success")
+        mDatabase.collection("Users").document(mUser?.uid.toString()).get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    log("fetchUserDetails():OnComplete:Success")
+                    mUserData = task.result?.toObject(UserData::class.java)
+                    log("fetchedUserData: $mUserData")
+                    setupTheNavigationHeader()
 
-                val fetchedUser: UserData = task.result?.toObject(UserData::class.java) as UserData
-                log("fetchedUserData: $fetchedUser")
-                mUserData = fetchedUser
-                setupTheNavigationHeader()
-            } else {
-                logError("fetchUserDetails: Error: {$task.exception}")
+                } else {
+                    logError("fetchUserDetails: Error: {$task.exception}")
+                }
             }
-        }
     }
-
 
 
     private fun setupTheNavigationHeader() {
         Glide.with(this)
-            .load(mUserData.avatar.toString())
+            .load(mUserData?.avatar.toString())
             .listener(object : RequestListener<Drawable> {
 
                 override fun onLoadFailed(
@@ -382,10 +385,11 @@ class MainActivity : AppCompatActivity(),
             .apply(RequestOptions.bitmapTransform(CircleCrop()).error(R.drawable.ic_detective))
             .thumbnail(0.5f)
             .into(mThumbnailImageView)
-        log("Glide: ${mUserData.avatar.toString()}")
+        log("Glide: ${mUserData?.avatar.toString()}")
+
         mNavigationView.menu.getItem(3).setActionView(R.layout.comp_dot) //Placing dot on the notifications fragment
 
-        mNameTextView.text = mUserData.name
+        mNameTextView.text = mUserData?.name
     }
 
 
@@ -393,11 +397,30 @@ class MainActivity : AppCompatActivity(),
         log("logoutTheUser():User Logged out Successfully")
         mAuth!!.signOut()
         log("logoutTheUser():Starting the LoginActivity")
-        startTheActivity(LoginActivity::class.java,mContext)
+        startTheActivity(LoginActivity::class.java)
     }
 
 
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
 
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(mContext, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
+    }
 
     override fun onResume() {
         super.onResume()

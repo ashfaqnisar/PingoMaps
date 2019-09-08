@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
-    private var mDatabase: FirebaseFirestore? = null
+    private lateinit var mDatabase: FirebaseFirestore
 
     //Google Variables
     private var mGoogleClient: GoogleSignInClient? = null
@@ -143,23 +143,25 @@ class LoginActivity : AppCompatActivity() {
 
     private fun firebaseAuthWithGoogle(mAccount: GoogleSignInAccount) {
 
-        val mCredential = GoogleAuthProvider.getCredential(mAccount.idToken, null)
 
+//        val mCredential = GoogleAuthProvider.getCredential(mAccount.idToken, null)
+
+        val mCredential = GoogleAuthProvider.getCredential(mAccount.idToken,null)
 
         mAuth!!.signInWithCredential(mCredential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 closeLoadingBar("firebaseAuthWithGoogle()")
                 log("firebaseAuthWithGoogle():signWithCredential(): User is successfully stored")
                 makeToast("User is successfully signed in!! ")
-                mDatabase!!.collection("Users").document(mUser?.uid.toString()).get()
+
+                mDatabase.collection("Users").document(mAuth?.currentUser?.uid.toString()).get()
                     .addOnCompleteListener{ task ->
-                    if (task.result == null){
+                    if (task.result?.toObject(UserData::class.java) == null){
                         startTheActivity(StoreUserDetails::class.java)
-                        log("Result:1:"+task.result.toString())
+                        log("Result:1:"+task.result?.toObject(UserData::class.java))
                     }
                     else{
-                        log("Result:2:"+task.result.toString())
-                        var mUserData: UserData? = task.result!!.toObject(UserData::class.java)
+                        log("Result:2:"+task.result?.toObject(UserData::class.java))
                         startTheActivity(MainActivity::class.java)
                     }
                 }

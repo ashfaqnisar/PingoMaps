@@ -179,7 +179,7 @@ class LoginActivity : AppCompatActivity() {
         val sEmail: String = mEmailET.text.toString().trim()
         val sPass: String = mPassET.text.toString().trim()
 
-        if (checkForErrors(sEmail, sPass)) {
+        if (!checkForErrors(sEmail, sPass)) {
             mAuth!!.signInWithEmailAndPassword(sEmail, sPass).addOnCompleteListener { Task ->
                 if (Task.isSuccessful) {
                     closeLoadingBar("loginTheUser: signInWithEmailAndPassword(): Successful")
@@ -195,22 +195,23 @@ class LoginActivity : AppCompatActivity() {
             }
 
         }
-
     }
 
     private fun checkForErrors(Email: String, Pass: String): Boolean {
+        var containsError = false
         if (Email.isEmpty()) {
-            closeLoadingBar("checkForErrors")
             mEmailET.error = "Please Enter The Email Id"
-            return false
+            containsError = true
         }
 
         if (Pass.isEmpty()) {
-            closeLoadingBar("checkForErrors")
             mPassET.error = "Please, Enter The Password"
-            return false
+            containsError = true
         }
-        return true
+        if (containsError){
+            closeLoadingBar("checkForErrors()")
+        }
+        return containsError
     }
 
     private fun checkForAlreadySignedInUser() {

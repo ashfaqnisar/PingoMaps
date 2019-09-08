@@ -101,8 +101,6 @@ class NavTripsFragment : BottomSheetDialogFragment(),
             listener = context
             log("onAttach():Fragment is attached")
             makeToast("Fragment is attached")
-        } else {
-            //throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 

@@ -8,7 +8,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.models.UserData
-import com.ezerka.pingo.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,6 +20,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var mContext: Context
 
     //Normal Variables
+    private lateinit var mNameRegisterET: EditText
     private lateinit var mEmailRegisterET: EditText
     private lateinit var mPassRegisterET: EditText
     private lateinit var mMobileRegisterET: EditText
@@ -45,6 +45,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun assignTheViews() {
+        mNameRegisterET = findViewById(R.id.id_ET_Register_Name)
         mEmailRegisterET = findViewById(R.id.id_ET_Register_Email)
         mPassRegisterET = findViewById(R.id.id_ET_Register_Pass)
         mMobileRegisterET = findViewById(R.id.id_ET_Register_Mobile)
@@ -74,7 +75,7 @@ class RegisterActivity : AppCompatActivity() {
 
         mBackToLoginText.setOnClickListener {
             log("assignTheLinks():mBackToLoginText: Starting the LoginActivity")
-            startTheActivity(LoginActivity::class.java,mContext)
+            startTheActivity(LoginActivity::class.java)
         }
     }
 
@@ -82,22 +83,22 @@ class RegisterActivity : AppCompatActivity() {
     private fun registerTheUser() {
         showLoadingBar("RegisterTheUser")
 
+        val sName: String = mNameRegisterET.text.toString().trim()
         val sEmail: String = mEmailRegisterET.text.toString().trim()
         val sPass: String = mPassRegisterET.text.toString().trim()
         val sMobile: String = mMobileRegisterET.text.toString().trim()
 
 
-        if (checkForErrors(sEmail, sPass, sMobile)) {
+        if (!checkForErrors(sName, sEmail, sPass, sMobile)) {
 
             mAuth!!.createUserWithEmailAndPassword(sEmail, sPass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    log("registerTheUser: Task Successful: User Registered: ${mAuth!!.uid}")
-                    storeTheDataOnDB()
-                    makeToast("Registered  Successfully ",mContext)
+                    log("registerTheUser(): Task Successful: User Created: ${mAuth!!.uid}")
+                    storeTheDataOnDB(sName, sEmail, sMobile)
                 } else {
-                    closeLoadingBar("registerTheUser: Failure Listener")
+                    closeLoadingBar("registerTheUser(): Failure Listener")
                     logError("registerTheUser(): Task Unsuccessful: ${task.exception}")
-                    makeToast("Unable to Register the user, Please Try Again.",mContext)
+                    makeToast("Unable to Register the user, Please Try Again.")
                 }
             }
 
@@ -105,7 +106,11 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
-    private fun storeTheDataOnDB() {
+    private fun storeTheDataOnDB(
+        sName: String,
+        sEmail: String,
+        sMobile: String
+    ) {
         log("storeTheDataOnDB():init")
         val userId: String = mAuth!!.currentUser!!.uid
 
@@ -116,50 +121,77 @@ class RegisterActivity : AppCompatActivity() {
         userDetails["user_id"] = userId.trim()
         userDetails["mobile"] = mMobileRegisterET.text.toString().trim()*/
 
-        mUserData.name = "Ashfaq"
-        mUserData.email = mEmailRegisterET.text.toString().trim()
+        mUserData.name = sName
+        mUserData.email = sEmail
         mUserData.user_id = userId
-        mUserData.mobile = mMobileRegisterET.text.toString().trim()
+        mUserData.mobile = sMobile
 
 
-        val userRef = mDatabase!!.collection("Users").document(userId)
+        mDatabase!!.collection("Users").document(userId).set(mUserData)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    closeLoadingBar("storeTheDataOnDB()")
+                    log("storeTheDataOnDB():Task Success(): Data has been successfully stored ")
+                    makeToast("Registered  Successfully ")
+                    mAuth!!.signOut()
+                    log("storeTheDataOnDB(): Signing out the user.")
+                    startTheActivity(LoginActivity::class.java)
 
-        userRef.set(mUserData).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                closeLoadingBar("storeTheDataOnDB()")
-                log("storeTheDataOnDB():Task Success(): Data has been successfully stored ")
-                makeToast("Data Stored Successfully",mContext)
-                mAuth!!.signOut()
-                log("registerTheUser: Signing out the user.")
-                startTheActivity(LoginActivity::class.java,mContext)
-
-            } else {
-                logError("storeTheDataOnDB():Task Failed: Unable to store the data " + task.exception)
-                makeToast("Error: " + task.exception.toString(),mContext)
+                } else {
+                    logError("storeTheDataOnDB():Task Failed: Unable to store the data " + task.exception)
+                    makeToast("Error: " + task.exception.toString())
+                }
             }
-        }
 
     }
 
-    private fun checkForErrors(Email: String, Pass: String, Mobile: String): Boolean {
-        closeLoadingBar("checkForErrors()")
+    private fun checkForErrors(Name: String, Email: String, Pass: String, Mobile: String): Boolean {
+
+        var containsError = false
+        if (Name.isEmpty()) {
+            mNameRegisterET.error = "Please Enter The Name"
+            containsError = true
+        }
         if (Email.isEmpty()) {
             mEmailRegisterET.error = "Please Enter The Email Id"
-            return false
+            containsError = true
         }
 
         if (Pass.isEmpty()) {
             mPassRegisterET.error = "Please, Enter The Password"
-            return false
+            containsError = true
         }
 
-        if (Mobile.isEmpty() && Mobile.toInt() <= 10) {
-            mMobileRegisterET.error = "Please, Enter the Mobile"
-            return false
+        if (Mobile.isEmpty()) {
+            mMobileRegisterET.error = "Please, Enter the Mobile Number"
+            containsError = true
         }
-        return true
+        if (containsError){
+            closeLoadingBar("checkForErrors()")
+        }
+        return containsError
     }
 
+    private fun log(log: String) {
+        Timber.d("Log: $log")
+    }
+
+    private fun logError(error: String) {
+        Timber.e("Log Error: $error")
+    }
+
+    private fun makeToast(toast: String) {
+        log("Toast: $toast")
+        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startTheActivity(mClass: Class<*>) {
+        log("startTheActivity(): ${mClass.simpleName}.class Activity")
+        val intent = Intent(mContext, mClass)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        log("startTheActivity(): Opened the ${mClass.simpleName}.class Activity")
+    }
 
     private fun showLoadingBar(method: String) {
         log("showLoadingBar(): $method")

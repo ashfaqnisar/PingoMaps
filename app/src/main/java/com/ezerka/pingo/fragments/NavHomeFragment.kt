@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import com.ezerka.pingo.R
 import com.ezerka.pingo.models.PolylineData
+import com.ezerka.pingo.models.SingletonObject.userSingleton
 import com.ezerka.pingo.models.UserData
 import com.ezerka.pingo.models.UserLocationData
 import com.ezerka.pingo.ui.BookingInputsActivity
@@ -576,18 +577,20 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
         if (mUserLocation == null) {
             mUserLocation = UserLocationData()
 
-            mDatabase.collection("Users").document(mUser?.uid.toString()).get()
+            mUserLocation?.user = userSingleton
+
+            /*mDatabase.collection("Users").document(mUser?.uid.toString()).get()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         log("getUserDetails():OnComplete:Success")
-                        mUserLocation?.user = task.result!!.toObject(UserData::class.java)
+                        mUserLocation?.userSingleton = task.result!!.toObject(UserData::class.java)
                         log("mUserLocation: $mUserLocation")
-                        log("User: ${mUserLocation?.user}")
+                        log("User: ${mUserLocation?.userSingleton}")
 
                     } else {
                         logError("getUserDetails: Error: {$task.exception}")
                     }
-                }
+                }*/
         }
 
     }

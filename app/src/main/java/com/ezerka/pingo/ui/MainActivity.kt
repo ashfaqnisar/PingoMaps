@@ -31,6 +31,7 @@ import com.bumptech.glide.request.target.Target
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.*
 import com.ezerka.pingo.models.UserData
+import com.ezerka.pingo.models.SingletonObject.userSingleton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mHandler: Handler
     private lateinit var mActiveFragment: Fragment
     private lateinit var mContext: Context
-    private var mUserData: UserData? = UserData()
+
 
     //Normal Variables
     private lateinit var mThumbnailImageView: ImageView
@@ -135,7 +136,6 @@ class MainActivity : AppCompatActivity(),
             }
         }
 
-        mUserData = UserData()
 
         mDatabase = FirebaseFirestore.getInstance()
 
@@ -342,8 +342,8 @@ class MainActivity : AppCompatActivity(),
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     log("fetchUserDetails():OnComplete:Success")
-                    mUserData = task.result?.toObject(UserData::class.java)
-                    log("fetchedUserData: $mUserData")
+                    userSingleton = task.result?.toObject(UserData::class.java)
+                    log("fetchedUserData: $userSingleton")
                     setupTheNavigationHeader()
 
                 } else {
@@ -355,7 +355,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun setupTheNavigationHeader() {
         Glide.with(this)
-            .load(mUserData?.avatar.toString())
+            .load(userSingleton?.avatar.toString())
             .listener(object : RequestListener<Drawable> {
 
                 override fun onLoadFailed(
@@ -385,11 +385,11 @@ class MainActivity : AppCompatActivity(),
             .apply(RequestOptions.bitmapTransform(CircleCrop()).error(R.drawable.ic_detective))
             .thumbnail(0.5f)
             .into(mThumbnailImageView)
-        log("Glide: ${mUserData?.avatar.toString()}")
+        log("Glide: ${userSingleton?.avatar.toString()}")
 
         mNavigationView.menu.getItem(3).setActionView(R.layout.comp_dot) //Placing dot on the notifications fragment
 
-        mNameTextView.text = mUserData?.name
+        mNameTextView.text = userSingleton?.name
     }
 
 

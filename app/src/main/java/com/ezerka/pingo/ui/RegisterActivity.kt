@@ -60,8 +60,6 @@ class RegisterActivity : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
 
-        mUser = mAuth!!.currentUser
-
         mDatabase = FirebaseFirestore.getInstance()
 
         mUserData = UserData()
@@ -166,7 +164,7 @@ class RegisterActivity : AppCompatActivity() {
             mMobileRegisterET.error = "Please, Enter the Mobile Number"
             containsError = true
         }
-        if (containsError){
+        if (containsError) {
             closeLoadingBar("checkForErrors()")
         }
         return containsError

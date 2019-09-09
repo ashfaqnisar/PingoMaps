@@ -355,7 +355,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun setupTheNavigationHeader() {
         Glide.with(this)
-            .load(userSingleton?.avatar.toString())
+            .load(userSingleton?.avatar?:"https://avatars1.githubusercontent.com/u/20638539?s=460&v=4")
             .listener(object : RequestListener<Drawable> {
 
                 override fun onLoadFailed(
@@ -395,7 +395,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun logoutTheUser() {
         log("logoutTheUser():User Logged out Successfully")
-        mAuth!!.signOut()
+        mAuth?.signOut()?:"User has already signed out"
         log("logoutTheUser():Starting the LoginActivity")
         startTheActivity(LoginActivity::class.java)
     }

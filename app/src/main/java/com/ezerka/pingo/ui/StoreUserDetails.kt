@@ -30,10 +30,10 @@ class StoreUserDetails : AppCompatActivity() {
     private lateinit var mStoreUserProgressBar: ProgressBar
 
     //Firebase Variables
-    private var mAuth: FirebaseAuth? = null
+    private lateinit var mAuth: FirebaseAuth
     private var mAuthListener: FirebaseAuth.AuthStateListener? = null
     private var mUser: FirebaseUser? = null
-    private var mDatabase: FirebaseFirestore? = null
+    private lateinit var mDatabase: FirebaseFirestore
 
     private lateinit var mUserData: UserData
 
@@ -58,7 +58,7 @@ class StoreUserDetails : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
 
-        mUser = mAuth!!.currentUser
+        mUser = mAuth.currentUser
 
         mDatabase = FirebaseFirestore.getInstance()
 
@@ -88,7 +88,7 @@ class StoreUserDetails : AppCompatActivity() {
 
     private fun storeTheDataOnDB(sEmail: String, sName: String, sMobile: String) {
         log("storeTheDataOnDB():init")
-        val userId: String = mAuth?.currentUser!!.uid
+        val userId: String = mAuth.currentUser?.uid?:throw NullPointerException()
 
         /*val userDetails = HashMap<String, Any>()
         userDetails["avatar"] = ""
@@ -102,7 +102,7 @@ class StoreUserDetails : AppCompatActivity() {
         mUserData.email = sEmail
         mUserData.mobile = sMobile
 
-        val userRef = mDatabase!!.collection("Users").document(userId)
+        val userRef = mDatabase.collection("Users").document(userId)
 
         userRef.set(mUserData).addOnCompleteListener { task ->
             if (task.isSuccessful) {

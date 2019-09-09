@@ -5,12 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.ezerka.pingo.R
 import com.ezerka.pingo.fragments.BottomSheetFragment
+import com.ezerka.pingo.models.SingletonObject.addressDataSingleton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import timber.log.Timber
 
@@ -24,6 +23,8 @@ class BookingInputsActivity : AppCompatActivity(),
     private lateinit var mOpenBottomSheetFragment: Button
     private lateinit var mBottomLinearLayout: LinearLayout
     private lateinit var mBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var mBottomPickUpAddress: TextView
+    private lateinit var mBottomDestAddress: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +46,13 @@ class BookingInputsActivity : AppCompatActivity(),
         mOpenBottomSheetFragment = findViewById(R.id.id_But_BottomSheetFragment)
 
         mBottomLinearLayout = findViewById(R.id.id_Layout_bottom_sheet)
+
+        mBottomPickUpAddress = mBottomLinearLayout.findViewById(R.id.id_Text_BottomSheet_Pickup_Address)
+        mBottomDestAddress = mBottomLinearLayout.findViewById(R.id.id_Text_BottomSheet_Dest_Address)
+
+        mBottomPickUpAddress.text = addressDataSingleton?.pickupAddress?:"Loading...."
+        mBottomDestAddress.text = addressDataSingleton?.destAddress?:"Loading...."
+
 
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomLinearLayout)
         mBottomSheetBehavior.setBottomSheetCallback(object :

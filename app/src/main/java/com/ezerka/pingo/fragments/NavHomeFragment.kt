@@ -255,8 +255,12 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
         mMap.setOnPolylineClickListener(this)
         mMap.uiSettings.isZoomControlsEnabled = false
-        mMap.isMyLocationEnabled = true
-
+        if (mLocationPermissionGranted){
+            mMap.isMyLocationEnabled = true
+        }else{
+            requestTheMapPermission()
+            mMap.isMyLocationEnabled = true
+        }
         isCameraIdle()
     }
 

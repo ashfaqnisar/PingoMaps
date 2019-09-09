@@ -52,7 +52,6 @@ class NavTripsFragment : BottomSheetDialogFragment(),
     private fun assignTheViews(view: View) {
 
         mViewPager = view.findViewById(R.id.id_ViewPager)
-
         mTabLayout = view.findViewById(R.id.id_Tabs_TripActivity)
         mTabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
@@ -62,14 +61,13 @@ class NavTripsFragment : BottomSheetDialogFragment(),
             ContextCompat.getColor(context!!, R.color.divider),
             ContextCompat.getColor(context!!, R.color.icons)
         )
-
         setupViewPager()
-
     }
 
     private fun setupViewPager() {
-        mViewPagerAdapter = TripsViewPagerAdapter(fragmentManager!!, mTabLayout.tabCount)
+        mViewPagerAdapter = TripsViewPagerAdapter(childFragmentManager, mTabLayout.tabCount)
         mViewPager.adapter = mViewPagerAdapter
+        mTabLayout.setupWithViewPager(mViewPager)
     }
 
     private fun assignTheLinks() {

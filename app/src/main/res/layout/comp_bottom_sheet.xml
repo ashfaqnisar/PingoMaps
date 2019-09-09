@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:text="@string/loading_pickup_address"
             android:textColor="@color/secondary_text"
-            android:id="@+id/id_Text_Bottom_Pickup_Address"/>
+            android:id="@+id/id_Text_BottomSheet_Pickup_Address"/>
 
     <TextView
             android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:text="@string/loading_destination_address"
             android:textColor="@color/secondary_text"
-            android:id="@+id/id_Text_Bottom_Destination_Address"/>
+            android:id="@+id/id_Text_BottomSheet_Dest_Address"/>
 
     <Button
             android:id="@+id/id_But_Place_Pickup"

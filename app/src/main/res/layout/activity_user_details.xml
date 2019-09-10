@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        tools:context=".ui.StoreUserDetails">
+        tools:context=".activity.StoreUserDetails">
 
     <EditText
             android:layout_width="0dp"

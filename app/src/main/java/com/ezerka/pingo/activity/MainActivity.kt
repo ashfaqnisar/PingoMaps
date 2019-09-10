@@ -1,4 +1,4 @@
-package com.ezerka.pingo.ui
+package com.ezerka.pingo.activity
 
 //Normal Imports
 

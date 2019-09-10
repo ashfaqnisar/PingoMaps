@@ -34,7 +34,7 @@ import com.ezerka.pingo.models.PolylineData
 import com.ezerka.pingo.models.SingletonObject.addressDataSingleton
 import com.ezerka.pingo.models.SingletonObject.userSingleton
 import com.ezerka.pingo.models.UserLocationData
-import com.ezerka.pingo.ui.BookingInputsActivity
+import com.ezerka.pingo.activity.BookingInputsActivity
 import com.ezerka.pingo.util.Constants
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -332,7 +332,7 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
 
     private fun placeTheDirections() {
         if (mPickupMarker != null && mDestinationMarker != null) {
-            makeToast("assignTheMethods(): Calculating Directions")
+            log("assignTheMethods(): Calculating Directions")
             calculateDirections(mPickupMarker, mDestinationMarker)
 
             val mPickupMarkerLatLng =

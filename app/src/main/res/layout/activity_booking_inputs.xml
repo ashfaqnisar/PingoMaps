@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#efefef"
-        tools:context="com.ezerka.pingo.ui.BookingInputsActivity">
+        tools:context="com.ezerka.pingo.activity.BookingInputsActivity">
 
     <include
             layout="@layout/content_booking_inputs"

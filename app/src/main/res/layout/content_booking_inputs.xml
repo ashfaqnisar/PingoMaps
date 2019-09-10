@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.BookingInputsActivity">
+        tools:context=".activity.BookingInputsActivity">
 
     <LinearLayout
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,7 +13,7 @@
             android:orientation="vertical"
             android:padding="16dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:context="com.ezerka.pingo.ui.BookingInputsActivity">
+            tools:context="com.ezerka.pingo.activity.BookingInputsActivity">
 
         <Button
                 android:id="@+id/id_But_BottomSheet"

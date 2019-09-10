@@ -16,10 +16,10 @@
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".ui.RegisterActivity">
+        <activity android:name=".activity.RegisterActivity">
         </activity>
         <activity
-                android:name=".ui.LoginActivity"
+                android:name=".activity.LoginActivity"
                 android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -27,15 +27,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.BookingInputsActivity">
+        <activity android:name=".activity.BookingInputsActivity">
         </activity>
         <activity
-                android:name=".ui.MainActivity"
+                android:name=".activity.MainActivity"
                 android:label="@string/title_activity_navigation"
                 android:theme="@style/AppTheme.NoActionBar"
                 android:hardwareAccelerated="true">
         </activity>
-        <activity android:name=".ui.StoreUserDetails"
+        <activity android:name=".activity.StoreUserDetails"
                 android:label="User Details"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

@@ -51,27 +51,28 @@ class NavTripsFragment : BottomSheetDialogFragment(),
 
     private fun assignTheViews(view: View) {
 
-        mViewPager = view.findViewById(R.id.id_ViewPager)
-        mTabLayout = view.findViewById(R.id.id_Tabs_TripActivity)
-        mTabLayout.tabGravity = TabLayout.GRAVITY_FILL
+        mViewPager = view.findViewById(R.id.id_ViewPager) as ViewPager
+        setupViewPager(mViewPager)
 
-        mTabLayout.addTab(mTabLayout.newTab().setText("History"))
-        mTabLayout.addTab(mTabLayout.newTab().setText("Upcoming"))
+        mTabLayout = view.findViewById(R.id.id_Tabs_TripActivity)
+        mTabLayout.setupWithViewPager(mViewPager)
+        /*mTabLayout.addTab(mTabLayout.newTab().setText("History"))
+        mTabLayout.addTab(mTabLayout.newTab().setText("Upcoming"))*/
         mTabLayout.setTabTextColors(
             ContextCompat.getColor(context!!, R.color.divider),
             ContextCompat.getColor(context!!, R.color.icons)
         )
-        setupViewPager()
     }
 
-    private fun setupViewPager() {
-        mViewPagerAdapter = TripsViewPagerAdapter(childFragmentManager, mTabLayout.tabCount)
-        mViewPager.adapter = mViewPagerAdapter
-        mTabLayout.setupWithViewPager(mViewPager)
+    private fun setupViewPager(viewPager: ViewPager) {
+        mViewPagerAdapter = TripsViewPagerAdapter(childFragmentManager)
+        mViewPagerAdapter.addFragment(TripsHistoryFragment(), "History")
+        mViewPagerAdapter.addFragment(TripsUpcomingFragment(), "Upcoming")
+        viewPager.adapter = mViewPagerAdapter
     }
 
     private fun assignTheLinks() {
-        mViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(mTabLayout))
+        /*mViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(mTabLayout))
 
         mTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -86,7 +87,7 @@ class NavTripsFragment : BottomSheetDialogFragment(),
 
             }
 
-        })
+        })*/
     }
 
     private fun assignTheMethods() {
@@ -98,7 +99,6 @@ class NavTripsFragment : BottomSheetDialogFragment(),
         if (context is OnFragmentInteractionListener) {
             listener = context
             log("onAttach():Fragment is attached")
-            makeToast("Fragment is attached")
         }
     }
 

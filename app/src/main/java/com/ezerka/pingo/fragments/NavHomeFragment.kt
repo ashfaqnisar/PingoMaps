@@ -259,7 +259,6 @@ class NavHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnPolylineClic
             mMap.isMyLocationEnabled = true
         }else{
             requestTheMapPermission()
-            mMap.isMyLocationEnabled = true
         }
         isCameraIdle()
     }

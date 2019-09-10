@@ -7,26 +7,28 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.ezerka.pingo.fragments.TripsHistoryFragment
 import com.ezerka.pingo.fragments.TripsUpcomingFragment
 
-class TripsViewPagerAdapter(manager: FragmentManager, private var tabCount: Int) :
+class TripsViewPagerAdapter(manager: FragmentManager) :
     FragmentPagerAdapter(manager) {
+
+    private val mFragmentList = ArrayList<Fragment>()
+    private val mFragmentTitleList = ArrayList<String>()
 
 
     override fun getCount(): Int {
-        return tabCount
+        return mFragmentList.size
     }
 
     override fun getItem(position: Int): Fragment {
-        return when (position) {
-            0 -> {
-                TripsHistoryFragment()
-            }
-            1 -> {
-                TripsUpcomingFragment()
-            }
-            else -> {
-                TripsHistoryFragment()
-            }
-        }
+        return mFragmentList[position]
+    }
+
+    fun addFragment(fragment: Fragment, title: String) {
+        mFragmentList.add(fragment)
+        mFragmentTitleList.add(title)
+    }
+
+    override fun getPageTitle(position: Int): CharSequence? {
+        return mFragmentTitleList[position]
     }
 
 

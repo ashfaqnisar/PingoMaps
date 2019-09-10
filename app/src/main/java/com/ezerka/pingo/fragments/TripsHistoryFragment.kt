@@ -30,7 +30,7 @@ class TripsHistoryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         log("onCreateView(): Fragment is created")
         val view = inflater.inflate(R.layout.fragment_trips_history, container, false)
         assignTheViews(view)
@@ -39,8 +39,8 @@ class TripsHistoryFragment : Fragment() {
         return view
     }
 
-    private fun assignTheViews(view: View?) {
-        mRecyclerView = view!!.findViewById(R.id.id_Recycler_History_Content)
+    private fun assignTheViews(view: View) {
+        mRecyclerView = view.findViewById(R.id.id_Recycler_History_Content)
 //        mRecyclerView.layoutManager = LinearLayoutManager(context)
     }
 
@@ -69,7 +69,7 @@ class TripsHistoryFragment : Fragment() {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
             listener = context
-            log("onAttach():Fragment is attached")
+            log("onAttach(): History Fragment is fetched")
         } else {
             throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
